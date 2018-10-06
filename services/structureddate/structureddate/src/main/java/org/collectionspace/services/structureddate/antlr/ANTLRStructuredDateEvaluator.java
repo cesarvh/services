@@ -107,6 +107,13 @@ public class ANTLRStructuredDateEvaluator extends StructuredDateBaseListener imp
 		stack = new Stack<Object>();
 
 		result = new StructuredDateInternal();
+
+		if (displayDate.equals("unknown")) {
+			result.setDisplayDate(displayDate);
+			result.setScalarValuesComputed(false);
+			return result;
+		}
+		
 		result.setDisplayDate(displayDate);
 
 		// Instantiate a parser from the lowercased display date, so that parsing will be
