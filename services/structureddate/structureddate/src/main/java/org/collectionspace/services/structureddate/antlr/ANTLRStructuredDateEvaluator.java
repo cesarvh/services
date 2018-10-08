@@ -108,14 +108,12 @@ public class ANTLRStructuredDateEvaluator extends StructuredDateBaseListener imp
 
 		result = new StructuredDateInternal();
 
+		result.setDisplayDate(displayDate);
+
 		if (displayDate.equals("unknown")) {
-			result.setDisplayDate(displayDate);
 			result.setScalarValuesComputed(false);
 			return result;
 		}
-		
-		result.setDisplayDate(displayDate);
-
 		// Instantiate a parser from the lowercased display date, so that parsing will be
 		// case insensitive.
 		ANTLRInputStream inputStream = new ANTLRInputStream(displayDate.toLowerCase());
@@ -387,6 +385,8 @@ public class ANTLRStructuredDateEvaluator extends StructuredDateBaseListener imp
 		// Expect the canonical year-month-day-era ordering
 		// to be on the stack.
 
+
+
 		Era era = (Era) stack.pop();
 		Integer dayOfMonth = (Integer) stack.pop();
 		Integer numMonth = (Integer) stack.pop();
@@ -410,6 +410,7 @@ public class ANTLRStructuredDateEvaluator extends StructuredDateBaseListener imp
 		// and reorder the stack into the canonical
 		// year-month-day-era ordering.
 
+
 		Era era = (Era) stack.pop();
 		Integer num3 = (Integer) stack.pop();
 		Integer num2 = (Integer) stack.pop();
@@ -431,20 +432,26 @@ public class ANTLRStructuredDateEvaluator extends StructuredDateBaseListener imp
 			year = num1;
 			numMonth = num2;
 			dayOfMonth = num3;
+		} else if (DateUtils.isValidDate(num3, num2, num1, era)) {
+			dayOfMonth = num1;
+			numMonth = num2;
 		}
 
 		stack.push(year);
 		stack.push(numMonth);
 		stack.push(dayOfMonth);
 		stack.push(era);
+
 	}
 
 	@Override
 	public void exitStrDate(StrDateContext ctx) {
+
 		if (ctx.exception != null) return;
 
 		// Reorder the stack into a canonical ordering,
 		// year-month-day-era.
+
 
 		Era era = (Era) stack.pop();
 		Integer year = (Integer) stack.pop();
@@ -461,13 +468,25 @@ public class ANTLRStructuredDateEvaluator extends StructuredDateBaseListener imp
 	public void exitInvStrDate(InvStrDateContext ctx) {
 		if (ctx.exception != null) return;
 
-		// Reorder the stack into a canonical ordering,
-		// year-month-day-era.
+		// Must take day-month-year into account now but default to year-month-day-era
+		Integer num1 = (Integer) stack.pop(); // 2015 OR  13
+		Integer num2 = (Integer) stack.pop(); // 4	  OR  4		 
+		Integer num3 = (Integer) stack.pop(); // 13   OR  2015
+		Era era = (Era) stack.pop(); // era
 
-		Integer dayOfMonth = (Integer) stack.pop();
-		Integer numMonth = (Integer) stack.pop();
-		Integer year = (Integer) stack.pop();
-		Era era = (Era) stack.pop();
+
+		// Default is DD-MM-YYY
+		int dayOfMonth = num1;
+		int numMonth = num2;
+		int year = num3;
+
+		if (DateUtils.isValidDate(num3, num2, num1, era)) {
+			// The default is year-month-day-era, so we can keep it
+		} else if (DateUtils.isValidDate(num1, num2, num3, era)) {
+			// Then we have a day-month-year-era, so we switch things around
+			dayOfMonth = num3;
+			year = num1;
+		}
 
 		stack.push(year);
 		stack.push(numMonth);
@@ -1029,9 +1048,9 @@ public class ANTLRStructuredDateEvaluator extends StructuredDateBaseListener imp
 
 		Integer dayOfMonth = new Integer(ctx.NUMBER().getText());
 
-		if (dayOfMonth == 0 || dayOfMonth > 31) {
-			throw new StructuredDateFormatException("unexpected day of month '" + ctx.NUMBER().getText() + "'");
-		}
+//		if (dayOfMonth == 0 || dayOfMonth > 31) {
+//			throw new StructuredDateFormatException("unexpected day of month '" + ctx.NUMBER().getText() + "'");
+//		}
 
 		stack.push(dayOfMonth);
 	}
