@@ -1100,11 +1100,26 @@
                                          earliestSingleDate: [1711,  1,  1, CE]
                                          latestDate:         [1757, 12, 31, CE]
 
-  "3/4/2000.":                           # oneDisplayDate - with period
+  '3/4/2000.':                           # oneDisplayDate - with period
                                          earliestSingleDate: [2000,  3,  4, CE]
 
-  "3/4/2000?":                           # oneDisplayDate - with question mark
+  '3/4/2000?':                           # oneDisplayDate - with question mark
                                          earliestSingleDate: [2000,  3,  4, CE]
+
+  '13 Apr 2015':                         #D/M/Y'
+                                         earliestSingleDate: [2015, 4,  13, CE]
+  
+  '14 Jan 1995':                         # More D/M/Y
+                                         earliestSingleDate: [1995, 1,  14, CE]
+
+  '29 oct 2914':                         # some comment
+                                         earliestSingleDate: [2914, 10, 29, CE]
+
+  '10/1989 - 12/1989':
+                                         earliestSingleDate: [1989, 10, 1, CE]
+                                         latestDate:         [1989, 12, 1, CE]
+
+                                         
 
 # -------------------------------------------------------------------------------------------------------
 # Invalid dates

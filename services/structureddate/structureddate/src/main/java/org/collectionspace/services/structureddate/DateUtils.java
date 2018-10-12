@@ -1312,4 +1312,19 @@ public class DateUtils {
 		date.setDay(dateTime.getDayOfMonth());
 		date.setEra((dateTime.getEra() == DateTimeConstants.BC) ? Era.BCE : Era.CE);
 	}
+
+	private static String stripEndLetters(String input) {
+		return input.replaceAll("[^\\d]+$", "");
+	}
+
+ 	public static int getNthDayOfMonth(String s) {
+		if (s == null) return -1;
+ 		int n = new Integer(stripEndLetters(s));
+		
+		if (n > 31) {
+			throw new StructuredDateFormatException("Unexpected day of month " + Integer.toString(n));
+		}
+		return n;
+	}
+
 }

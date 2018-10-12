@@ -56,7 +56,7 @@ quarterInYearRange:    nthQuarterInYearRange
 
 date:                  numDate
 |                      strDate
-|                      invStrDate
+// |                      invStrDate
 ;
 
 month:                 monthYear
@@ -90,13 +90,16 @@ century:               ( strCentury | numCentury ) era ;
 
 millennium:            nth MILLENNIUM era ;
 
-strDate:               strMonth ( numDayOfMonth | nth ) COMMA? numYear era;
+strDate:               strMonth ( numDayOfMonth | nth ) COMMA? numYear era
+|                      ( numDayOfMonth | nth ) strMonth COMMA? numYear era
+|                      era numYear COMMA? strMonth numDayOfMonth ;
 invStrDate:            era numYear COMMA? strMonth numDayOfMonth ;
 strDayInMonthRange:    strMonth numDayOfMonth ( HYPHEN | DASH ) numDayOfMonth COMMA? numYear era ;
 monthInYearRange:      strMonth ( HYPHEN | DASH ) strMonth COMMA? numYear era ;
 nthQuarterInYearRange: nthQuarter ( HYPHEN | DASH ) nthQuarter COMMA? numYear era ;
 strSeasonInYearRange:  strSeason ( HYPHEN | DASH ) strSeason COMMA? numYear era ;
-numDayInMonthRange:    numMonth SLASH numDayOfMonth ( HYPHEN | DASH ) numDayOfMonth SLASH numYear era ;
+numDayInMonthRange:    numMonth SLASH numDayOfMonth ( HYPHEN | DASH ) numDayOfMonth SLASH numYear era 
+|                      numMonth SLASH numYear ( HYPHEN | DASH ) numMonth SLASH numYear era ;
 numDate:               num SLASH num SLASH num era
 |                      num HYPHEN num HYPHEN num era ;
 monthYear:             strMonth COMMA? numYear era ;
