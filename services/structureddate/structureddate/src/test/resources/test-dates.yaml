@@ -1119,6 +1119,15 @@
                                          earliestSingleDate: [1995,  4, 13, CE]
                                          latestDate:         [2018,  4, 13, CE]
 
+  "before 13 april 1995":
+                                         earliestSingleDate: []
+                                         latestDate:         [1995,  4, 13, CE]
+
+  # "before april 13 1995":
+  #                                        earliestSingleDate: [1995,  4, 13, CE]
+  #                                        latestDate:         [2018,  10, 17, CE]
+
+
   # "after 13 april 1995":
   #                                        earliestSingleDate: [1995,  4, 13, CE]
   #                                        latestDate:         [2018,  10, 17, CE]
