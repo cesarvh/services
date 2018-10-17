@@ -8,14 +8,17 @@ grammar StructuredDate;
 /*
  * Parser rules
  */
+// unknownDisplayDate:    
 
-oneDisplayDate:        displayDate ( DOT | QUESTION )? EOF ; 
+oneDisplayDate:        displayDate ( DOT | QUESTION )? EOF ;
 
 displayDate:           uncertainDate
 |                      certainDate
 /* TODO: Need to decide what "before" and "after" actually mean
 |                      beforeOrAfterDate
 */
+|                      beforeOrAfterDate
+// |                      unknownDate
 ;
 
 uncertainDate:         CIRCA certainDate ;
@@ -91,12 +94,14 @@ century:               ( strCentury | numCentury ) era ;
 millennium:            nth MILLENNIUM era ;
 
 strDate:               strMonth ( numDayOfMonth | nth ) COMMA? numYear era;
-invStrDate:            era numYear COMMA? strMonth numDayOfMonth ;
+invStrDate:            era num COMMA? strMonth num
+|                      ( num | nth ) strMonth COMMA? num era ;
 strDayInMonthRange:    strMonth numDayOfMonth ( HYPHEN | DASH ) numDayOfMonth COMMA? numYear era ;
 monthInYearRange:      strMonth ( HYPHEN | DASH ) strMonth COMMA? numYear era ;
 nthQuarterInYearRange: nthQuarter ( HYPHEN | DASH ) nthQuarter COMMA? numYear era ;
 strSeasonInYearRange:  strSeason ( HYPHEN | DASH ) strSeason COMMA? numYear era ;
-numDayInMonthRange:    numMonth SLASH numDayOfMonth ( HYPHEN | DASH ) numDayOfMonth SLASH numYear era ;
+numDayInMonthRange:    numMonth SLASH numDayOfMonth ( HYPHEN | DASH ) numDayOfMonth SLASH numYear era 
+|                      numMonth SLASH numYear ( HYPHEN | DASH ) numMonth SLASH numYear era ;
 numDate:               num SLASH num SLASH num era
 |                      num HYPHEN num HYPHEN num era ;
 monthYear:             strMonth COMMA? numYear era ;
@@ -120,7 +125,7 @@ numYear:               NUMBER ;
 numMonth:              NUMBER ;
 numDayOfMonth:         NUMBER ;
 num:                   NUMBER ;
-
+// unknownDate:           UNKNOWN ;
 
 /*
  * Lexer rules
@@ -162,3 +167,4 @@ DOT:            '.' ;
 QUESTION:       '?' ;
 STRING:         [a-z]+ ;
 OTHER:          . ;
+// UNKNOWN:        'unknown';
