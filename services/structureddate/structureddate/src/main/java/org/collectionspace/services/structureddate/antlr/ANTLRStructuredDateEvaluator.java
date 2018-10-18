@@ -78,6 +78,7 @@ import org.collectionspace.services.structureddate.antlr.StructuredDateParser.St
 import org.collectionspace.services.structureddate.antlr.StructuredDateParser.StrMonthContext;
 import org.collectionspace.services.structureddate.antlr.StructuredDateParser.StrSeasonContext;
 import org.collectionspace.services.structureddate.antlr.StructuredDateParser.UncertainDateContext;
+import org.collectionspace.services.structureddate.antlr.StructuredDateParser.UnknownDateContext;
 import org.collectionspace.services.structureddate.antlr.StructuredDateParser.YearContext;
 import org.collectionspace.services.structureddate.antlr.StructuredDateParser.YearSpanningWinterContext;
 
@@ -157,6 +158,14 @@ public class ANTLRStructuredDateEvaluator extends StructuredDateBaseListener imp
 
 		result.setEarliestSingleDate(earliestDate);
 		result.setLatestDate(latestDate);
+	}
+	@Override
+	public void exitUnknownDate(UnknownDateContext ctx) {
+		if (ctx.exception != null) return;
+
+		// Dummy dates
+		stack.push(new Date());
+		stack.push(new Date());
 	}
 
 	@Override

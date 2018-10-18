@@ -8,17 +8,12 @@ grammar StructuredDate;
 /*
  * Parser rules
  */
-// unknownDisplayDate:    
-
-oneDisplayDate:        displayDate ( DOT | QUESTION )? EOF ;
+oneDisplayDate:        displayDate ( DOT | QUESTION )? EOF;
 
 displayDate:           uncertainDate
 |                      certainDate
-/* TODO: Need to decide what "before" and "after" actually mean
 |                      beforeOrAfterDate
-*/
-|                      beforeOrAfterDate
-// |                      unknownDate
+|                      unknownDate
 ;
 
 uncertainDate:         CIRCA certainDate ;
@@ -35,7 +30,6 @@ hyphenatedRange:       singleInterval ( HYPHEN | DASH ) singleInterval
 |                      quarterInYearRange
 |                      strDayInMonthRange
 |                      numDayInMonthRange
-// |                      numMonthInYearsRange
 ;
 
 singleInterval:        yearSpanningWinter
@@ -125,7 +119,7 @@ numYear:               NUMBER ;
 numMonth:              NUMBER ;
 numDayOfMonth:         NUMBER ;
 num:                   NUMBER ;
-// unknownDate:           UNKNOWN ;
+unknownDate:           UNKNOWN ;
 
 /*
  * Lexer rules
@@ -165,6 +159,6 @@ DASH:           [—–] ; /* EM DASH, EN DASH */
 SLASH:          '/' ;
 DOT:            '.' ;
 QUESTION:       '?' ;
-STRING:         [a-z]+ ;
 OTHER:          . ;
-// UNKNOWN:        'unknown';
+UNKNOWN:        'unknown';
+STRING:         [a-z]+ ;
