@@ -77,6 +77,7 @@ import org.collectionspace.services.structureddate.antlr.StructuredDateParser.St
 import org.collectionspace.services.structureddate.antlr.StructuredDateParser.StrDayInMonthRangeContext;
 import org.collectionspace.services.structureddate.antlr.StructuredDateParser.StrMonthContext;
 import org.collectionspace.services.structureddate.antlr.StructuredDateParser.StrSeasonContext;
+import org.collectionspace.services.structureddate.antlr.StructuredDateParser.UncalibratedDateContext;
 import org.collectionspace.services.structureddate.antlr.StructuredDateParser.UncertainDateContext;
 import org.collectionspace.services.structureddate.antlr.StructuredDateParser.YearContext;
 import org.collectionspace.services.structureddate.antlr.StructuredDateParser.YearSpanningWinterContext;
@@ -1039,6 +1040,31 @@ public class ANTLRStructuredDateEvaluator extends StructuredDateBaseListener imp
 		Integer num = new Integer(ctx.NUMBER().getText());
 
 		stack.push(num);
+	}
+
+	@Override
+	public void exitUncalibratedDate(UncalibratedDateContext ctx) {
+		if (ctx.exception != null) return;
+
+		Integer mainYear = Integer.parseInt(ctx.numYear().getText());
+		Integer adjustmentDate = Integer.parseInt(ctx.NUMBER().getText());
+
+		Integer upperBound = mainYear + adjustmentDate;
+		Integer lowerBound = mainYear - adjustmentDate;
+
+		Integer currentYear = DateUtils.getCurrentDate().getYear();
+
+		Integer earliestYear = currentYear - upperBound;
+		Integer latestYear = currentYear - lowerBound ;
+
+		// If negative, then BC, else AD
+		Era earliestEra = earliestYear < 0 ? Era.BCE : Era.CE;
+		Era latestEra = latestYear < 0 ? Era.BCE : Era.CE;
+
+		stack.push(new Date(Math.abs(earliestYear), 1, 1, earliestEra)); // Earliest Early Date
+		stack.push(new Date(Math.abs(latestYear), 12, DateUtils.getDaysInMonth(12, Math.abs(latestYear), latestEra), latestEra)); // Latest Late Date
+
+
 	}
 
 	protected String getErrorMessage(RecognitionException re) {

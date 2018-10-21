@@ -1106,6 +1106,25 @@
   "3/4/2000?":                           # oneDisplayDate - with question mark
                                          earliestSingleDate: [2000,  3,  4, CE]
 
+  "1200±50 BP":                          # Uncalibrated date with ± symbol, with CE
+                                         earliestSingleDate: [768,  1, 1, CE]
+                                         latestDate:         [868,  12, 31, CE]
+
+  "3100 +/- 150 BP":                    # Uncalibrated date with +/- instead of ± symbol
+                                         earliestSingleDate: [1232,  1, 1, BCE]
+                                         latestDate:         [932,  12, 31, BCE]
+
+  "3100+/-150 BP":                      # Uncalibrated date with +/- instead of ± symbol, no spaces
+                                         earliestSingleDate: [1232,  1, 1, BCE]
+                                         latestDate:         [932,  12, 31, BCE]
+
+  "3100+/-150 years BP":                 # Uncalibrated date with 'years' in it
+                                         earliestSingleDate: [1232,  1, 1, BCE]
+                                         latestDate:         [932,  12, 31, BCE]
+
+  "2000±100 BP":                         # Uncalibrated date with BCE and AD mix
+                                         earliestSingleDate: [82,  1, 1, BCE]
+                                         latestDate:         [118,  12, 31, CE]
 # -------------------------------------------------------------------------------------------------------
 # Invalid dates
 # -------------------------------------------------------------------------------------------------------
