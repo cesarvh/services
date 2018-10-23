@@ -10,6 +10,7 @@ import org.joda.time.Years;
 import org.joda.time.chrono.GJChronology;
 import org.joda.time.format.DateTimeFormat;
 import org.joda.time.format.DateTimeFormatter;
+import org.joda.time.LocalDate;
 
 public class DateUtils {
 	private static final DateTimeFormatter monthFormatter = DateTimeFormat.forPattern("MMMM");
@@ -1063,7 +1064,8 @@ public class DateUtils {
 	 */
 	public static Date getEarliestBeforeDate(Date startDate, Date endDate) {
 		// TODO
-		return null;
+		// Return an empty date to be used in before date cases
+		return new Date();
 		
 		/*
 		// This algorithm is inherited from the XDB fuzzydate parser,
@@ -1106,7 +1108,7 @@ public class DateUtils {
 	
 	/**
 	 * Calculates the latest date that may be considered to be "after"
-	 * a given date range.
+	 * a given date range. We define "after" as the current date.
 	 * 
 	 * @param startDate The first date in the range
 	 * @param endDate   The last date in the range
@@ -1114,7 +1116,16 @@ public class DateUtils {
 	 */
 	public static Date getLatestAfterDate(Date startDate, Date endDate) {
 		// TODO
-		return null;
+		return getCurrentDate();
+
+	}
+
+	public static Date getCurrentDate() {
+		LocalDate localDate = new LocalDate();
+		Integer year = (Integer) localDate.getYear();
+		Integer month = (Integer) localDate.getMonthOfYear();
+		Integer dayOfMonth = (Integer) localDate.getDayOfMonth();
+		return new Date(year, month, dayOfMonth, Date.DEFAULT_ERA);
 	}
 
 	public static int getYearsBetween(Date startDate, Date endDate) {
