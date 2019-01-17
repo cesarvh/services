@@ -18,6 +18,7 @@
         <module>updateimagederivatives</module>
         <module>naturalhistory</module>
         <module>botgarden</module>
+        <module>pahma</module>
     </modules>
 
     <dependencies>
