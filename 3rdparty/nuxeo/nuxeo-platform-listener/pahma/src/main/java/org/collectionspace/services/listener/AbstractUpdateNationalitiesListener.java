@@ -78,7 +78,7 @@ public class AbstractUpdateNationalitiesListener implements EventListener {
             personCsid = getCsidForDesiredDocTypeFromRelation(docModel, PERSON_DOCTYPE, COLLECTIONOBJECT_DOCTYPE);
 
             if (Tools.isBlank(personCsid)) {
-                logger.warm("Could not obtain csid for persons record from document event"); // TO DO: More detail
+                logger.warn("Could not obtain csid for persons record from document event"); // TO DO: More detail
                 logger.warn(NO_FURTHER_PROCESSING_MESSAGE);
                 return;
             }
