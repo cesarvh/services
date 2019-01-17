@@ -1,4 +1,4 @@
-package org.collectionspace.services.listener;
+package org.collectionspace.services.listener.pahma;
 
 import java.util.GregorianCalendar;
 import java.util.HashSet;
