@@ -18,9 +18,9 @@ import org.nuxeo.ecm.core.event.EventContext;
 import org.nuxeo.ecm.core.event.EventListener;
 import org.nuxeo.ecm.core.event.impl.DocumentEventContext;
 
-public class AbstractUpdateNationalitiesListener extends EventListener {
+public class AbstractUpdateNationalitiesListener implements EventListener {
 
-    private final static Log logger = LogFactory.getLog(AbstractUpdateObjectLocationValues.class);
+    private final static Log logger = LogFactory.getLog(AbstractUpdateNationalitiesListener.class);
     private final static String NO_FURTHER_PROCESSING_MESSAGE =
             "This event listener will not continue processing this event ...";
     
@@ -134,8 +134,8 @@ public class AbstractUpdateNationalitiesListener extends EventListener {
         return csid;
     }
 
-    protected static boolean documentMatchesType(DocumentModel docModel, String doctype) {
-        if (docModel == null || Tools.isBlank(doctype)) {
+    protected static boolean documentMatchesType(DocumentModel docModel, String docType) {
+        if (docModel == null || Tools.isBlank(docType)) {
             return false;
         }
         if (docModel.getType().startsWith(docType)) {
