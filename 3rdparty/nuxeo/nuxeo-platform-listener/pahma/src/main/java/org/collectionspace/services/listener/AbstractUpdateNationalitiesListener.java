@@ -1,7 +1,9 @@
-package org.collectionspace.services.listener;
+package org.collectionspace.services.listener.pahma;
 
 import java.util.GregorianCalendar;
 import java.util.HashSet;
+import java.util.Map;
+import java.util.*;
 import java.util.Set;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -25,19 +27,21 @@ public class AbstractUpdateNationalitiesListener implements EventListener {
             "This event listener will not continue processing this event ...";
     
     private final static GregorianCalendar EARLIEST_COMPARISON_DATE = new GregorianCalendar(1600, 1, 1);
-    private final static String RELATIONS_COMMON_SCHEMA = "relations_common"; // FIXME: Get from external constant
-    private final static String RELATION_DOCTYPE = "Relation"; // FIXME: Get from external constant
-    private final static String PERSON_DOCTYPE = "Persons";
+
     private final static String SUBJECT_CSID_PROPERTY = "subjectCsid"; // FIXME: Get from external constant
     private final static String OBJECT_CSID_PROPERTY = "objectCsid"; // FIXME: Get from external constant
     private final static String SUBJECT_DOCTYPE_PROPERTY = "subjectDocumentType"; // FIXME: Get from external constant
     private final static String OBJECT_DOCTYPE_PROPERTY = "objectDocumentType"; // FIXME: Get from external constant
+
+    private final static String COLLECTIONOBJECT_DOCTYPE = "Collectionobject";
     protected final static String COLLECTIONOBJECTS_COMMON_SCHEMA = "collectionobjects_common"; // FIXME: Get from external constant
     private final static String COLLECTIONOBJECT_DOCTYPE = "CollectionObject"; // FIXME: Get from external constant
     private final static String COLLECTIONOBJECTS_PAHMA_SCHEMA = "collectionobjects_pahma";
+
+    private final static String PERSON_DOCTYPE = "Person";
     private final static String PERSONS_SCHEMA = "persons_common";
     private final static String PERSONS_NATIONALITIES_SCHEMA = "persons_common_nationalities";
-    private final static String MOVEMENT_DOCTYPE = MovementConstants.NUXEO_DOCTYPE;
+
     protected final static String COLLECTIONSPACE_CORE_SCHEMA = "collectionspace_core"; // FIXME: Get from external constant
     protected final static String CREATED_AT_PROPERTY = "createdAt"; // FIXME: Get from external constant
     protected final static String UPDATED_AT_PROPERTY = "updatedAt"; // FIXME: Get from external constant
@@ -51,7 +55,7 @@ public class AbstractUpdateNationalitiesListener implements EventListener {
     public enum EventNotificationDocumentType {
         // Document type about which we've received a notification
 
-        PERSONS, RELATION, COLLECTIONOBJECT;
+        PERSONS, COLLECTIONOBJECT;
     }
     
     
@@ -71,32 +75,30 @@ public class AbstractUpdateNationalitiesListener implements EventListener {
         String personCsid = "";
         Enum notificationDocummentType;
 
-        if (documentMatchesType(docModel, RELATION_DOCTYPE)) {
-            logger.trace("Relation document was received"); // TO DO: add more detail
-            // get csid
+        // Two possibilities:
+        // Either one Person record is being added to the document, or one from the dropdown is
 
-            personCsid = getCsidForDesiredDocTypeFromRelation(docModel, PERSON_DOCTYPE, COLLECTIONOBJECT_DOCTYPE);
 
-            if (Tools.isBlank(personCsid)) {
-                logger.warn("Could not obtain csid for persons record from document event"); // TO DO: More detail
-                logger.warn(NO_FURTHER_PROCESSING_MESSAGE);
-                return;
-            }
-            notificationDocummentType = EventNotificationDocumentType.RELATION;
-        } else if (documentMatchesType(docModel, PERSON_DOCTYPE)) {
-            // get directly from persons record
-            logger.trace("Something involving persons record"); // TO DO: More detail
+        if (documentMatchesType(docModel, PERSON_DOCTYPE)) {
+            logger.trace("Person document was received");
 
             personCsid = NuxeoUtils.getCsid(docModel);
             if (Tools.isBlank(personCsid)) {
-                logger.warn("Could not obtain CSID for Person record from document event."); 
+                logger.warn("Could not obtain CSID for Person record from document event.");
                 logger.warn(NO_FURTHER_PROCESSING_MESSAGE);
                 return;
             }
-            notificationDocummentType = EventNotificationDocumentType.PERSONS;
+        } else if (documentMatchesType(docModel, COLLECTIONOBJECT_DOCTYPE)) {
+            // Then we're adding a term,
+            // 1. Need to obtain the change
+            // 2. Then get that record's csid
+            return;
         } else {
-            logger.trace("No persons record was involved");
+            logger.trace("No pesons record was involved");
+            return;
         }
+
+//        personCsid = getCsidForDesiredDocTypeFromRelation(docModel, PERSON_DOCTYPE, COLLECTIONOBJECT_DOCTYPE);
     }
 
 
