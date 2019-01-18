@@ -93,8 +93,8 @@ public class UpdateNationalitiesListener implements EventListener {
         } else if (documentMatchesType(docModel, COLLECTIONOBJECT_DOCTYPE)) {
 
             // Obtain the previous document
-            DocumentModel previousDoc = (DocumentModel) context.getProperty(CoreEventConstants.PREVIOUS_DOCUMENT_MODEL);
-            String field = 'bampfaObjectProductionPerson';
+            DocumentModel previousDoc = (DocumentModel) docEventContext.getProperty(CoreEventConstants.PREVIOUS_DOCUMENT_MODEL);
+            String field = "bampfaObjectProductionPerson";
 
             // String previousLabel = (String) previous
 
