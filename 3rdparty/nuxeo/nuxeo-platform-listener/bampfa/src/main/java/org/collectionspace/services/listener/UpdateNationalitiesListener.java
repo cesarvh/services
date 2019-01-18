@@ -14,6 +14,8 @@ import org.collectionspace.services.nuxeo.util.NuxeoUtils;
 import org.nuxeo.ecm.core.api.ClientException;
 import org.nuxeo.ecm.core.api.CoreSession;
 import org.nuxeo.ecm.core.api.DocumentModel;
+import org.nuxeo.ecm.core.api.event.CoreEventConstants;
+import org.nuxeo.ecm.core.api.event.DocumentEventTypes;
 import org.nuxeo.ecm.core.api.DocumentModelList;
 import org.nuxeo.ecm.core.event.Event;
 import org.nuxeo.ecm.core.event.EventContext;
@@ -89,6 +91,16 @@ public class UpdateNationalitiesListener implements EventListener {
                 return;
             }
         } else if (documentMatchesType(docModel, COLLECTIONOBJECT_DOCTYPE)) {
+
+            // Obtain the previous document
+            DocumentModel previousDoc = (DocumentModel) context.getProperty(CoreEventConstants.PREVIOUS_DOCUMENT_MODEL);
+            String field = 'bampfaObjectProductionPerson';
+
+            // String previousLabel = (String) previous
+
+
+            // We want to know if this type of event involves the Artist 
+
             // Then we're adding a term,
             // 1. Need to obtain the change
             // 2. Then get that record's csid
