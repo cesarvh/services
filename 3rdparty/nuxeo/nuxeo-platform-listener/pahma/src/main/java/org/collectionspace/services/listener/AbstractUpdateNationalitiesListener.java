@@ -33,9 +33,9 @@ public class AbstractUpdateNationalitiesListener implements EventListener {
     private final static String SUBJECT_DOCTYPE_PROPERTY = "subjectDocumentType"; // FIXME: Get from external constant
     private final static String OBJECT_DOCTYPE_PROPERTY = "objectDocumentType"; // FIXME: Get from external constant
 
-    private final static String COLLECTIONOBJECT_DOCTYPE = "Collectionobject";
+    private final static String COLLECTIONOBJECT_DOCTYPE = "CollectionObject";
     protected final static String COLLECTIONOBJECTS_COMMON_SCHEMA = "collectionobjects_common"; // FIXME: Get from external constant
-    private final static String COLLECTIONOBJECT_DOCTYPE = "CollectionObject"; // FIXME: Get from external constant
+    //private final static String COLLECTIONOBJECT_DOCTYPE = "CollectionObject"; // FIXME: Get from external constant
     private final static String COLLECTIONOBJECTS_PAHMA_SCHEMA = "collectionobjects_pahma";
 
     private final static String PERSON_DOCTYPE = "Person";
@@ -101,40 +101,6 @@ public class AbstractUpdateNationalitiesListener implements EventListener {
 //        personCsid = getCsidForDesiredDocTypeFromRelation(docModel, PERSON_DOCTYPE, COLLECTIONOBJECT_DOCTYPE);
     }
 
-
-
-
-
-
-
-    /**
-     * Returns the CSID for a desired document type from a Relation record,
-     * where the relationship involves two specified, different document types.
-     *
-     * @param relationDocModel a document model for a Relation record.
-     * @param desiredDocType a desired document type.
-     * @param relatedDocType a related document type.
-     * @throws ClientException
-     * @return the CSID from the desired document type in the relation. Returns
-     * an empty string if the Relation record does not involve both the desired
-     * and related document types, or if the desired document type is at both
-     * ends of the relation.
-     */
-    protected static String getCsidForDesiredDocTypeFromRelation(DocumentModel relationDocModel,
-            String desiredDocType, String relatedDocType) throws ClientException {
-        String csid = "";
-        String subjectDocType = (String) relationDocModel.getProperty(RELATIONS_COMMON_SCHEMA, SUBJECT_DOCTYPE_PROPERTY);
-        String objectDocType = (String) relationDocModel.getProperty(RELATIONS_COMMON_SCHEMA, OBJECT_DOCTYPE_PROPERTY);
-        if (subjectDocType.startsWith(desiredDocType) && objectDocType.startsWith(desiredDocType)) {
-            return csid;
-        }
-        if (subjectDocType.startsWith(desiredDocType) && objectDocType.startsWith(relatedDocType)) {
-            csid = (String) relationDocModel.getProperty(RELATIONS_COMMON_SCHEMA, SUBJECT_CSID_PROPERTY);
-        } else if (subjectDocType.startsWith(relatedDocType) && objectDocType.startsWith(desiredDocType)) {
-            csid = (String) relationDocModel.getProperty(RELATIONS_COMMON_SCHEMA, OBJECT_CSID_PROPERTY);
-        }
-        return csid;
-    }
 
     protected static boolean documentMatchesType(DocumentModel docModel, String docType) {
         if (docModel == null || Tools.isBlank(docType)) {
