@@ -24,7 +24,6 @@ import org.nuxeo.ecm.core.event.EventListener;
 import org.nuxeo.ecm.core.event.impl.DocumentEventContext;
 import org.collectionspace.services.batch.BatchResource;
 import org.collectionspace.services.batch.nuxeo.UpdateObjectNationalitiesFromPersonBatchJob;
-import org.collectionspace.services.batch.nuxeo.UpdateObjectNationalitiesFromPersonBatchJob.updateNationalitiesFromPerson;
 import org.collectionspace.services.common.invocable.InvocationResults;
 
 
