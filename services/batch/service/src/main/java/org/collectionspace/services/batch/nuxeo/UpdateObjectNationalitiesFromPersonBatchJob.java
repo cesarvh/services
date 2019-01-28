@@ -25,10 +25,10 @@ public class UpdateObjectNationalitiesFromPersonBatchJob extends AbstractBatchJo
 
 
     public InvocationResults updateNationalitiesFromPerson(String csid) throws URISyntaxException, DocumentException, Exception {
-        String nationalitiesField = "nationalities";
+        String sourceField = "collectionobjects_bampfa:bampfaObjectProductionPerson";
         String serviceName = "personauthorities";
 
-        List<String> collectionObjectsList =  findReferencingCollectionObjects(serviceName, csid, nationalitiesField);
+        List<String> collectionObjectsList =  findReferencingCollectionObjects(serviceName, csid, sourceField);
 
         return null;
     }

@@ -1,30 +1,47 @@
 package org.collectionspace.services.listener.bampfa;
 
-import java.util.GregorianCalendar;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
-import java.util.*;
 import java.util.Set;
+import java.util.Collections;
+
+import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.collectionspace.services.batch.BatchResource;
+import org.collectionspace.services.batch.nuxeo.UpdateAccessCodeBatchJob;
+import org.collectionspace.services.batch.nuxeo.UpdateAccessCodeBatchJob.UpdateAccessCodeResults;
+import org.collectionspace.services.client.BatchClient;
+import org.collectionspace.services.client.PoxPayloadIn;
+import org.collectionspace.services.client.PoxPayloadOut;
 import org.collectionspace.services.client.workflow.WorkflowClient;
-import org.collectionspace.services.common.api.Tools;
-import org.collectionspace.services.movement.nuxeo.MovementConstants;
-import org.collectionspace.services.nuxeo.util.NuxeoUtils;
-import org.nuxeo.ecm.core.api.ClientException;
-import org.nuxeo.ecm.core.api.CoreSession;
+import org.collectionspace.services.collectionobject.nuxeo.CollectionObjectBotGardenConstants;
+import org.collectionspace.services.collectionobject.nuxeo.CollectionObjectConstants;
+import org.collectionspace.services.common.ResourceMap;
+import org.collectionspace.services.common.context.ServiceContext;
+import org.collectionspace.services.common.invocable.InvocationResults;
+import org.collectionspace.services.common.relation.nuxeo.RelationConstants;
+import org.collectionspace.services.nuxeo.client.java.CoreSessionWrapper;
+import org.collectionspace.services.nuxeo.listener.AbstractCSEventListenerImpl;
+import org.collectionspace.services.taxonomy.nuxeo.TaxonBotGardenConstants;
+import org.collectionspace.services.taxonomy.nuxeo.TaxonConstants;
+import org.collectionspace.services.taxonomy.nuxeo.TaxonomyAuthorityConstants;
+import org.jboss.resteasy.spi.ResteasyProviderFactory;
 import org.nuxeo.ecm.core.api.DocumentModel;
 import org.nuxeo.ecm.core.api.event.CoreEventConstants;
 import org.nuxeo.ecm.core.api.event.DocumentEventTypes;
-import org.nuxeo.ecm.core.api.DocumentModelList;
-import org.nuxeo.ecm.core.api.model.impl.ListProperty;
 import org.nuxeo.ecm.core.event.Event;
 import org.nuxeo.ecm.core.event.EventContext;
-import org.nuxeo.ecm.core.event.EventListener;
 import org.nuxeo.ecm.core.event.impl.DocumentEventContext;
-import org.collectionspace.services.batch.BatchResource;
+import org.collectionspace.services.common.api.Tools;
+import org.collectionspace.services.nuxeo.util.NuxeoUtils;
+import org.nuxeo.ecm.core.api.ClientException;
+import org.nuxeo.ecm.core.api.CoreSession;
+import org.nuxeo.ecm.core.event.EventListener;
 import org.collectionspace.services.batch.nuxeo.UpdateObjectNationalitiesFromPersonBatchJob;
-import org.collectionspace.services.common.invocable.InvocationResults;
 
 
 public class UpdateNationalitiesListener implements EventListener {
@@ -102,7 +119,7 @@ public class UpdateNationalitiesListener implements EventListener {
                     return;
                 }
                 
-                try { updateCollectionObjectsFromPerson(docModel); }
+                try { updateCollectionObjectsFromPerson(docModel, docEventContext); }
                 catch (Exception e) {
                     int x = 0;
                 }
@@ -170,14 +187,23 @@ public class UpdateNationalitiesListener implements EventListener {
         return false;
     }
     
-    private void updateCollectionObjectsFromPerson(DocumentModel docModel) throws Exception {
+    private void updateCollectionObjectsFromPerson(DocumentModel docModel, DocumentEventContext context) throws Exception {
         String refName = (String) docModel.getProperty(PERSONS_SCHEMA, "refName");
                         //  docModel.getProperty(PERSONS_SCHEMA, "nationalities")
         String personCsid = (String) docModel.getName();
 
+        ResourceMap resourceMap = ResteasyProviderFactory.getContextData(ResourceMap.class);
+		BatchResource batchResource = (BatchResource) resourceMap.get(BatchClient.SERVICE_NAME);
+		ServiceContext<PoxPayloadIn, PoxPayloadOut> serviceContext = batchResource.createServiceContext(batchResource.getServiceName());
+
+		serviceContext.setCurrentRepositorySession(new CoreSessionWrapper(context.getCoreSession()));
+
+
 
         UpdateObjectNationalitiesFromPersonBatchJob updater = new UpdateObjectNationalitiesFromPersonBatchJob();
 
+		updater.setServiceContext(serviceContext);
+        updater.setResourceMap(resourceMap);
 
         InvocationResults res = updater.updateNationalitiesFromPerson(personCsid); // throws exception???????
     }
