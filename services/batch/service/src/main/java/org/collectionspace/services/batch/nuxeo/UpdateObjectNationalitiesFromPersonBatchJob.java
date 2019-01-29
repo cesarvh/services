@@ -101,13 +101,15 @@ public class UpdateObjectNationalitiesFromPersonBatchJob extends AbstractBatchJo
             "</document>";
 
 
+
+
         // Now update????
-        NuxeoBasedResource collectionObjectResource = (NuxeoBasedResource) resourceMap.get(CollectionObjectClient.SERVICE_NAME);
-        ResourceMap resourceMap = getResourceMap();
+        ResourceMap resourcemap = getResourceMap();
+        NuxeoBasedResource collectionObjectResource = (NuxeoBasedResource) resourcemap.get(CollectionObjectClient.SERVICE_NAME);
         UriInfo uriInfo = setupQueryParamForUpdateRecords();
 
 
-        byte[] responseBytes = collectionObjectResource.update(getServiceContext(), resourceMap, uriInfo, objCsid, updatePayload);
+        byte[] responseBytes = collectionObjectResource.update(getServiceContext(), resourcemap, uriInfo, objCsid, updatePayload);
 
 
 
