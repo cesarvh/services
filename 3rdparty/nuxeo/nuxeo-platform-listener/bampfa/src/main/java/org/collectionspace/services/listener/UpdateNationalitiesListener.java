@@ -3,6 +3,7 @@ package org.collectionspace.services.listener.bampfa;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashSet;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -118,10 +119,17 @@ public class UpdateNationalitiesListener implements EventListener {
                 if (newNationalities.equals(previousNationalities)) {
                     return;
                 }
+
+                Map<String, List> nationalitiesToUpdate = findNationalities(previousNationalities, newNationalities);
                 
-                try { updateCollectionObjectsFromPerson(docModel, docEventContext); }
+                try {
+                    String personCsid = (String) docModel.getName();
+
+                    InvocationResults results = updateCollectionObjectsFromPerson(docEventContext).updateNationalitiesFromPerson(personCsid, nationalitiesToUpdate);
+                    
+                    }
                 catch (Exception e) {
-                    int x = 0;
+
                 }
             }
 
@@ -149,6 +157,31 @@ public class UpdateNationalitiesListener implements EventListener {
             logger.trace("No persons or collection object record was involved.");
             return;
         }
+    }
+
+    public Map<String, List> findNationalities(List oldNationalities, List newNationalities) {
+        Map<String, List> nationalities =  new HashMap<String, List>();
+
+        List<String> fieldsToDelete = new ArrayList<String>();
+        List<String> fieldsToAdd = new ArrayList<String>();
+
+        for (Object n : oldNationalities) {
+            String nationality = (String) n;
+            if (!newNationalities.contains(nationality)) {
+                fieldsToDelete.add(nationality);
+            }
+        }
+
+        for (Object n : newNationalities) {
+            String nationality = (String) n;
+            if (!oldNationalities.contains(nationality)) {
+                fieldsToAdd.add(nationality);
+            }
+        }
+        nationalities.put("add", fieldsToAdd);
+        nationalities.put("delete", fieldsToDelete);
+
+        return nationalities;
     }
 
     public List<String> getNationalities(DocumentModel docModel, CoreSession coreSession) {
@@ -187,10 +220,7 @@ public class UpdateNationalitiesListener implements EventListener {
         return false;
     }
     
-    private void updateCollectionObjectsFromPerson(DocumentModel docModel, DocumentEventContext context) throws Exception {
-        String refName = (String) docModel.getProperty(PERSONS_SCHEMA, "refName");
-                        //  docModel.getProperty(PERSONS_SCHEMA, "nationalities")
-        String personCsid = (String) docModel.getName();
+    private UpdateObjectNationalitiesFromPersonBatchJob updateCollectionObjectsFromPerson(DocumentEventContext context) throws Exception {
 
         ResourceMap resourceMap = ResteasyProviderFactory.getContextData(ResourceMap.class);
 		BatchResource batchResource = (BatchResource) resourceMap.get(BatchClient.SERVICE_NAME);
@@ -198,14 +228,12 @@ public class UpdateNationalitiesListener implements EventListener {
 
 		serviceContext.setCurrentRepositorySession(new CoreSessionWrapper(context.getCoreSession()));
 
-
-
         UpdateObjectNationalitiesFromPersonBatchJob updater = new UpdateObjectNationalitiesFromPersonBatchJob();
 
 		updater.setServiceContext(serviceContext);
         updater.setResourceMap(resourceMap);
-
-        InvocationResults res = updater.updateNationalitiesFromPerson(personCsid); // throws exception???????
+        
+        return updater;
     }
 
 }
