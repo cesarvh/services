@@ -1,16 +1,22 @@
 package org.collectionspace.services.batch.nuxeo;
 
-import java.util.List;
 import java.util.Arrays;
-import java.util.Map;
 import java.util.HashMap;
-import java.net.URISyntaxException;
+import java.util.List;
+import java.util.Map;
+
+import org.collectionspace.services.client.CollectionObjectClient;
+import org.collectionspace.services.client.IClientQueryParams;
+import org.collectionspace.services.client.PoxPayloadOut;
+import org.collectionspace.services.common.api.Tools;
 import org.collectionspace.services.common.invocable.InvocationResults;
+import org.collectionspace.services.common.NuxeoBasedResource;
+import org.collectionspace.services.common.ResourceMap;
 import org.collectionspace.services.common.vocabulary.AuthorityResource;
 import org.dom4j.DocumentException;
-import org.collectionspace.services.client.PoxPayloadOut;
+import java.net.URISyntaxException;
+import javax.ws.rs.core.UriInfo;
 
-import org.dom4j.DocumentException;
 
 public class UpdateObjectNationalitiesFromPersonBatchJob extends AbstractBatchJob {
     
@@ -25,6 +31,7 @@ public class UpdateObjectNationalitiesFromPersonBatchJob extends AbstractBatchJo
 
     }
 
+
     public InvocationResults updateNationalitiesFromPerson(String personCsid, Map<String, List> nationalitiesToUpdate) throws URISyntaxException, DocumentException, Exception {
         String sourceField = "collectionobjects_bampfa:bampfaObjectProductionPerson";
         String serviceName = "personauthorities";
@@ -37,6 +44,11 @@ public class UpdateObjectNationalitiesFromPersonBatchJob extends AbstractBatchJo
         for (String csid : collectionObjectsList) {
             PoxPayloadOut collectionObjectPayload = findCollectionObjectByCsid(csid);
             // String inAuthority = getFieldValue(collectionObjectPayload, "collectionobjects_common", "inAuthority");
+
+
+            // TO DO: Make sure you skip over soft deleted records
+
+
 
             // Why is this a String??
             // collectionObjectPayload.getPart("collectionobjects_bampfa").asElement().selectNodes("nationalities/nationality").getText()
@@ -88,12 +100,49 @@ public class UpdateObjectNationalitiesFromPersonBatchJob extends AbstractBatchJo
             "</ns2:collectionobjects_bampfa>" +
             "</document>";
 
+
         // Now update????
+        NuxeoBasedResource collectionObjectResource = (NuxeoBasedResource) resourceMap.get(CollectionObjectClient.SERVICE_NAME);
+        ResourceMap resourceMap = getResourceMap();
+        UriInfo uriInfo = setupQueryParamForUpdateRecords();
+
+
+        byte[] responseBytes = collectionObjectResource.update(getServiceContext(), resourceMap, uriInfo, objCsid, updatePayload);
+
+
+
     
-		AuthorityResource<?, ?> resource = (AuthorityResource<?, ?>) getResourceMap().get("personauthorities");
+		// AuthorityResource<?, ?> resource = (AuthorityResource<?, ?>) getResourceMap().get("personauthorities");
 		// resource.updateAuthorityItem(getServiceContext(), getResourceMap(), createUriInfo(), authorityCsid, objCsid, , updatePayload);
-		resource.updateAuthorityItem(getServiceContext(), getResourceMap(), createUriInfo(), objCsid, objCsid, updatePayload);
+		// resource.updateAuthorityItem(getServiceContext(), getResourceMap(), createUriInfo(), objCsid, objCsid, updatePayload);
 
 
     }
+
+    protected UriInfo setupQueryParamForUpdateRecords() throws URISyntaxException {
+    	UriInfo result = null;
+
+    	//
+    	// Check first to see if we've got a query param.  It will override any invocation context value
+    	//
+    	String updateCoreValues = (String) getServiceContext().getQueryParams().getFirst(IClientQueryParams.UPDATE_CORE_VALUES);
+    	if (Tools.isBlank(updateCoreValues)) {
+    		//
+    		// Since there is no query param, let's check the invocation context
+    		//
+    		updateCoreValues = getInvocationContext().getUpdateCoreValues();
+    	}
+
+    	//
+    	// If we found a value, then use it to create a query parameter
+    	//
+    	if (Tools.notBlank(updateCoreValues)) {
+        	result = createUriInfo(IClientQueryParams.UPDATE_CORE_VALUES + "=" + updateCoreValues);
+        }
+        
+    	return result;
+    }
 }
+
+
+
