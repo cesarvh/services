@@ -32,7 +32,9 @@ import org.nuxeo.ecm.core.event.impl.DocumentEventContext;
 import org.nuxeo.ecm.core.api.ClientException;
 import org.nuxeo.ecm.core.api.CoreSession;
 import org.nuxeo.ecm.core.event.EventListener;
-
+import java.io.FileWriter;
+import java.io.File;
+import java.io.IOException;
 
 /**
  * This listener updates the collectionobjects_bampfa:nationalities field whenever either 1) A new bampfaObjectProductionPerson is
@@ -60,14 +62,26 @@ public class UpdateNationalitiesListener implements EventListener {
 
 
 
+
     @Override
     public void handleEvent(Event event) throws ClientException {
-        logger.trace("In handleEvent in update nationalities listener.");
+            EventContext eventContext = event.getContext();
 
-        EventContext eventContext = event.getContext();
-        if (eventContext == null || !(eventContext instanceof DocumentEventContext)) {
-            return;
+        File tempFile = null;
+        FileWriter writer = null;
+        try {
+            tempFile = File.createTempFile("nationalities_log.txt", ".tmp");
+            writer = new FileWriter(tempFile);
+                System.out.format("Canonical filename: %s\n", tempFile.getCanonicalFile());
+        } catch (IOException e) {
+            
         }
+        try {
+            writeError("We about to write", writer);
+        } catch (Exception e) {
+            System.out.println("ah");
+        }
+
 
         DocumentEventContext docEventContext = (DocumentEventContext) eventContext;
         DocumentModel docModel = docEventContext.getSourceDocument();
@@ -80,9 +94,12 @@ public class UpdateNationalitiesListener implements EventListener {
 					!docModel.isProxy() &&
 					!docModel.getCurrentLifeCycleState().equals(WorkflowClient.WORKFLOWSTATE_DELETED)) {
             
-            if (logger.isTraceEnabled()) {
-                logger.trace("The update involved a person authority record. Now checking if updating a collection object is required");
+            try {
+                writeError("Document type is person authority", writer);
+            } catch (Exception e) {
+                System.out.println("ah");
             }
+
 
             if (event.getName().equals(DocumentEventTypes.DOCUMENT_CREATED)) {
                 // If the document has just beeen created, it will definitely not be used by any collection object record
@@ -132,6 +149,12 @@ public class UpdateNationalitiesListener implements EventListener {
             }
 
         } else if (documentMatchesType(docModel, COLLECTIONOBJECT_DOCTYPE)) {
+            try {
+                writeError("Document type is collection object", writer);
+            } catch (Exception e) {
+                System.out.println("ah");
+            }
+
             if (event.getName().equals((DocumentEventTypes.DOCUMENT_CREATED))) {
                 // If the document is created, we simply call saveDocument in order to trigger the beforeDocumentSaved event
                 docModel.getCoreSession().saveDocument(docModel);
@@ -152,6 +175,10 @@ public class UpdateNationalitiesListener implements EventListener {
             }
             return;
         }
+    }
+
+    public void writeError(String err, FileWriter writer) throws IOException {
+        writer.write(err);
     }
 
     /**
