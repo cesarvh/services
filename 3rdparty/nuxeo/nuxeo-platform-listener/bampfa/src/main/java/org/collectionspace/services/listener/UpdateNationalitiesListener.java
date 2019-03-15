@@ -109,13 +109,23 @@ public class UpdateNationalitiesListener implements EventListener {
                 Collections.sort(previousNationalities);
                 Collections.sort(newNationalitiesCopy);
 
+
+                /*
+                 * IMPORTANT: This following bit of code is trying to be smart and is short-circuiting the listener in the event
+                 *          that there is an update to a persons record, but the nationalities have not changed. This is to avoid
+                 *          useless updates to collectionobjects records. If a person is used by 30,000 records, we don't want 
+                 *          all of these records to be updated every time. HOWEVER, in the event that the links between the two
+                 *          records haven't been made, this piece of code will cause the links to fail to go through and update
+                 *          collection objects records. If this is something that needs to be done, comment out the next 6 lines of code.
+                 */    
                 // if they are equal, we don't need to update the lists
-                if (newNationalities.equals(previousNationalities)) {
-                    if (logger.isTraceEnabled()) {
-                        logger.trace("There are no changes to the nationalities field in this record. No updates to any collection object required. " + NO_FURTHER_PROCESSING_MESSAGE);
-                    }
-                    return;
-                }
+
+                // if (newNationalities.equals(previousNationalities)) {
+                //     if (logger.isTraceEnabled()) {
+                //         logger.trace("There are no changes to the nationalities field in this record. No updates to any collection object required. " + NO_FURTHER_PROCESSING_MESSAGE);
+                //     }
+                //     return;
+                // }
                 
                 // Get a list of the nationalities that need to be deleted, and those that need to be added.
                 Map<String, List> nationalitiesToUpdate = findNationalitiesToUpdate(previousNationalities, newNationalities);
