@@ -159,8 +159,6 @@ public class ANTLRStructuredDateEvaluator extends StructuredDateBaseListener imp
 	@Override
 	public void exitDisplayDate(DisplayDateContext ctx) {
 		if (ctx.exception != null) return;
-		System.out.println("Display date: ");
-		System.out.println(stack);
 
 		Date latestDate = (Date) stack.pop();
 		Date earliestDate = (Date) stack.pop();
@@ -295,8 +293,6 @@ public class ANTLRStructuredDateEvaluator extends StructuredDateBaseListener imp
 
 		stack.push(earliestDate);
 		stack.push(latestDate);
-		System.out.println("After exit Certain date: ");
-		System.out.println(stack);
 	}
 
 	@Override
@@ -1205,25 +1201,18 @@ public class ANTLRStructuredDateEvaluator extends StructuredDateBaseListener imp
 	@Override
 	public void exitPartialEraRange(PartialEraRangeContext ctx) {
 		if (ctx.exception != null) return;
-		
-		System.out.println(stack);
 
-		Integer earlyDay = (Integer) stack.pop();
-		Integer earlyMonth = (Integer) stack.pop();
-		Integer earlyYear = (Integer) stack.pop();
-		Era earlyEra = (Era) stack.pop();
-		System.out.println(stack);
+		Integer secondYear = (Integer) stack.pop();
+		Integer secondMonth = (Integer) stack.pop();
+		Integer secondDay = (Integer) stack.pop();
 
-		Integer lateDay = (Integer) stack.pop();
-		Integer lateMonth = (Integer) stack.pop();
-		Integer lateYear = (Integer) stack.pop();
-		Era lateEra = stack.size() == 0 ? null : (Era) stack.pop();
-		System.out.println(stack);
+		Era era = (Era) stack.pop();
+		Integer firstYear = (Integer) stack.pop();
+		Integer firstMonth = (Integer) stack.pop();
+		Integer firstDay = (Integer) stack.pop();
 
-		stack.push(new Date(earlyYear, earlyMonth, earlyDay, earlyEra));
-		stack.push(new Date(lateYear, lateMonth, lateDay, lateEra));
-		System.out.println(stack);
-
+		stack.push(new Date(secondYear, secondMonth, secondDay, null));
+		stack.push(new Date(firstYear, firstMonth, firstDay, era));
 	}
 
 	@Override
