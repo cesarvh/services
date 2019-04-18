@@ -94,6 +94,7 @@ import org.collectionspace.services.structureddate.antlr.StructuredDateParser.Un
 import org.collectionspace.services.structureddate.antlr.StructuredDateParser.UnknownDateContext;
 import org.collectionspace.services.structureddate.antlr.StructuredDateParser.YearContext;
 import org.collectionspace.services.structureddate.antlr.StructuredDateParser.YearSpanningWinterContext;
+import org.collectionspace.services.structureddate.antlr.StructuredDateParser.PartialEraRangeContext;
 
 /**
  * A StructuredDateEvaluator that uses an ANTLR parser to parse the display date,
@@ -158,6 +159,8 @@ public class ANTLRStructuredDateEvaluator extends StructuredDateBaseListener imp
 	@Override
 	public void exitDisplayDate(DisplayDateContext ctx) {
 		if (ctx.exception != null) return;
+		System.out.println("Display date: ");
+		System.out.println(stack);
 
 		Date latestDate = (Date) stack.pop();
 		Date earliestDate = (Date) stack.pop();
@@ -292,6 +295,8 @@ public class ANTLRStructuredDateEvaluator extends StructuredDateBaseListener imp
 
 		stack.push(earliestDate);
 		stack.push(latestDate);
+		System.out.println("After exit Certain date: ");
+		System.out.println(stack);
 	}
 
 	@Override
@@ -1198,6 +1203,30 @@ public class ANTLRStructuredDateEvaluator extends StructuredDateBaseListener imp
 	}
 
 	@Override
+	public void exitPartialEraRange(PartialEraRangeContext ctx) {
+		if (ctx.exception != null) return;
+		
+		System.out.println(stack);
+
+		Integer earlyDay = (Integer) stack.pop();
+		Integer earlyMonth = (Integer) stack.pop();
+		Integer earlyYear = (Integer) stack.pop();
+		Era earlyEra = (Era) stack.pop();
+		System.out.println(stack);
+
+		Integer lateDay = (Integer) stack.pop();
+		Integer lateMonth = (Integer) stack.pop();
+		Integer lateYear = (Integer) stack.pop();
+		Era lateEra = stack.size() == 0 ? null : (Era) stack.pop();
+		System.out.println(stack);
+
+		stack.push(new Date(earlyYear, earlyMonth, earlyDay, earlyEra));
+		stack.push(new Date(lateYear, lateMonth, lateDay, lateEra));
+		System.out.println(stack);
+
+	}
+
+	@Override
 	public void exitNum(NumContext ctx) {
 		if (ctx.exception != null) return;
 
@@ -1219,7 +1248,6 @@ public class ANTLRStructuredDateEvaluator extends StructuredDateBaseListener imp
 	@Override
 	public void exitRomanDate(RomanDateContext ctx) {
 		if (ctx.exception != null) return;
-		System.out.println("I am going in here");
 		
 		Era era = (ctx.era() == null) ? null : (Era) stack.pop();
 		Integer year = (Integer) stack.pop();

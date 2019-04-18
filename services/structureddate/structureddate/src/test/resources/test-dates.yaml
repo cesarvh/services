@@ -1269,9 +1269,9 @@
   '01-IV-2017 BCE':                          # Day-Month-Year with roman numeral as month, with Era
                                           earliestSingleDate: [2017, 4, 1, BCE]  
   
-  # '12 june 1942 - 13 june 1943':            # hyphenatedRange, date with comma'd numbers
-  #                                        earliestSingleDate: [1942,  6,  12, CE]
-  #                                        latestDate:         [1942,  6,  13, CE]
+  '12 june 1942 BCE - 13 june 1943':            # hyphenatedRange, date with comma'd numbers
+                                         earliestSingleDate: [1942,  6,  12, BCE]
+                                         latestDate:         [1943,  6,  13, CE]
 
 # -------------------------------------------------------------------------------------------------------
 # Invalid dates
