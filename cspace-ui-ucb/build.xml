@@ -15,7 +15,7 @@
         <os family="windows" />
     </condition>
 
-    <property name="cspace.ui.lib.url" value="https://unpkg.com/cspace-ui@${cspace.ui.version}/dist/cspaceUI.min.js" />
+    <property name="cspace.ui.lib.url" value="https://unpkg.com/@ucb-cspace/cspace-ui@${cspace.ui.version}/dist/cspaceUI.min.js" />
     <property name="cspace.ui.profile.plugin.dist.url" value="https://unpkg.com/cspace-ui-plugin-profile-${cspace.ui.profile.name}@${cspace.ui.profile.version}/dist" />
 
     <target name="plugininfo">
