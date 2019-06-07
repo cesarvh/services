@@ -333,7 +333,7 @@ INSERT INTO id_generators
       <currentValue>.</currentValue>
     </org.collectionspace.services.id.StringIDGeneratorPart>
     <org.collectionspace.services.id.NumericIDGeneratorPart>
-      <maxLength></maxLength>
+      <maxLength>6</maxLength>
       <initialValue>1</initialValue>
       <currentValue>-1</currentValue>
     </org.collectionspace.services.id.NumericIDGeneratorPart>
