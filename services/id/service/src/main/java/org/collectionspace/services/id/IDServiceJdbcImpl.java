@@ -767,7 +767,7 @@ public class IDServiceJdbcImpl implements IDService {
 
         if (serializedIDGenerator == null || serializedIDGenerator.equals("")) {
             throw new BadRequestException(
-                    "Could not understand or parse this representation of an ID generator.");
+                    "Could not understand or parse this representation of an ID generator. (in updateIDGenerator)");
         }
 
         SettableIDGenerator generator;
