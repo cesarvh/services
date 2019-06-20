@@ -113,6 +113,8 @@ public class BatchDocumentModelHandler extends NuxeoDocumentModelHandler<BatchCo
 					invocationMode, batchCommon.getName());
 			throw new BadRequestException(msg);
 		}
+		System.out.println("the result: ");
+		System.out.println(result);
 
 		System.out.println("HEEEEERE inside supports invocationmode END ======");
 		
