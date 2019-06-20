@@ -221,8 +221,15 @@ public class BatchResource extends NuxeoBasedResource {
         try {
             ServiceContext<PoxPayloadIn, PoxPayloadOut> ctx = createServiceContext(ui);
             BatchDocumentModelHandler handler = (BatchDocumentModelHandler)createDocumentHandler(ctx);
+            System.out.println("ctx: " + ctx);
+            System.out.println("csid: " + csid);
+            System.out.println("resourceMap: " + resourceMap.toString());
+            System.out.println("inv context: " + (String) invContext);
+
             return handler.invokeBatchJob(ctx, csid, resourceMap, invContext, getBatchCommon(csid));
         } catch (Exception e) {
+            
+
         	String msg = String.format("%s Could not invoke batch job with CSID='%s'.",
         			ServiceMessages.POST_FAILED, csid);
             throw bigReThrow(e, msg);
