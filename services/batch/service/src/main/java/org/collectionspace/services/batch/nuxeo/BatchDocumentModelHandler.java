@@ -75,6 +75,8 @@ public class BatchDocumentModelHandler extends NuxeoDocumentModelHandler<BatchCo
 	 * @throws BadRequestException 
 	 */
 	protected boolean supportsInvokationMode(InvocationContext invocationCtx, BatchCommon batchCommon) throws BadRequestException {
+
+		System.out.println("HEEEEERE inside supports invocationmode START ======");
 		boolean result = false;
 		
 		String invocationMode = invocationCtx.getMode().toLowerCase();
@@ -91,6 +93,8 @@ public class BatchDocumentModelHandler extends NuxeoDocumentModelHandler<BatchCo
 					invocationMode, batchCommon.getName());
 			throw new BadRequestException(msg);
 		}
+
+		System.out.println("HEEEEERE inside supports invocationmode END ======");
 		
 		return result;
 	}
