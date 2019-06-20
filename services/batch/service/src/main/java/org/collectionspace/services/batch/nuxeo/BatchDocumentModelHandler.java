@@ -242,6 +242,8 @@ public class BatchDocumentModelHandler extends NuxeoDocumentModelHandler<BatchCo
 			//
 			// Ensure the batch job supports the requested invocation context's mode type
 			System.out.println("========= here 2");
+			System.out.println(invocationCtx);
+			System.out.println(batchCommon);
 			if (supportsInvokationMode(invocationCtx, batchCommon) == false) {
 				String msg = String.format("BatchResource: The batch job '%s' CSID='%s' does not support the invocation mode '%s'.", 
 						batchCommon.getName(), csid, invocationCtx.getMode());
