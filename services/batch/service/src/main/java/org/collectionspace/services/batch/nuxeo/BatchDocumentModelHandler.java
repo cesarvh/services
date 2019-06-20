@@ -232,6 +232,7 @@ public class BatchDocumentModelHandler extends NuxeoDocumentModelHandler<BatchCo
 		try {
 			//
 			// Ensure the current user has permission to run this batch job
+			System.out.println("========= here 1");
 			if (isAuthoritzed(batchCommon) == false) {
 				String msg = String.format("BatchResource: The user '%s' does not have permission to run the batch job '%s' CSID='%s'", 
 						AuthN.get().getUserId(), batchCommon.getName(), csid);
@@ -240,6 +241,7 @@ public class BatchDocumentModelHandler extends NuxeoDocumentModelHandler<BatchCo
 			
 			//
 			// Ensure the batch job supports the requested invocation context's mode type
+			System.out.println("========= here 2");
 			if (supportsInvokationMode(invocationCtx, batchCommon) == false) {
 				String msg = String.format("BatchResource: The batch job '%s' CSID='%s' does not support the invocation mode '%s'.", 
 						batchCommon.getName(), csid, invocationCtx.getMode());
@@ -248,6 +250,7 @@ public class BatchDocumentModelHandler extends NuxeoDocumentModelHandler<BatchCo
 			
 			//
 			// Ensure the batch job supports the requested invocation context's document type
+			System.out.println("========= here 3");
 			if (!Invocable.INVOCATION_MODE_NO_CONTEXT.equalsIgnoreCase(invocationCtx.getMode())) {
 				ForDocTypes forDocTypes = batchCommon.getForDocTypes();
 				if (forDocTypes != null) {
@@ -264,7 +267,7 @@ public class BatchDocumentModelHandler extends NuxeoDocumentModelHandler<BatchCo
 			// Now that we've ensure all the prerequisites have been met, let's try to
 			// instantiate and run the batch job.
 			//
-			
+			System.out.println("========= here 4");
 			String className = batchCommon.getClassName().trim();
 			ClassLoader tccl = Thread.currentThread().getContextClassLoader();
 			Class<?> c = tccl.loadClass(className);
@@ -272,15 +275,16 @@ public class BatchDocumentModelHandler extends NuxeoDocumentModelHandler<BatchCo
 			if (!BatchInvocable.class.isAssignableFrom(c)) {
 				throw new RuntimeException("BatchResource: Class: " + className + " does not implement BatchInvocable!");
 			}
-	
+			System.out.println("========= here 4");
 			BatchInvocable batchInstance = (BatchInvocable) c.newInstance();
 			List<String> modes = batchInstance.getSupportedInvocationModes();
+			System.out.println("========= here 5");
 			if (!modes.contains(invocationCtx.getMode().toLowerCase())) {
 				String msg = String.format("BatchResource: Invoked with unsupported mode '%s'.  Batch class '%s' supports these modes: %s.",
 						invocationCtx.getMode().toLowerCase(), className, modes.toString());
 				throw new BadRequestException(msg);
 			}
-	
+			System.out.println("========= here 6");
 			batchInstance.setInvocationContext(invocationCtx);
 			batchInstance.setServiceContext(ctx);
 			
@@ -294,7 +298,7 @@ public class BatchDocumentModelHandler extends NuxeoDocumentModelHandler<BatchCo
 					logger.warn("BatchResource.invoke did not get a resourceMapHolder in context!");
 				}
 			}
-	
+			System.out.println("========= here 7");
 			batchInstance.run();
 			int status = batchInstance.getCompletionStatus();
 			if (status == Invocable.STATUS_ERROR) {
@@ -308,7 +312,7 @@ public class BatchDocumentModelHandler extends NuxeoDocumentModelHandler<BatchCo
 	
 				}
 			}
-	
+			System.out.println("========= here 8");
 			InvocationResults results = batchInstance.getResults();
 			return results;
 		} catch (PermissionException e) {
