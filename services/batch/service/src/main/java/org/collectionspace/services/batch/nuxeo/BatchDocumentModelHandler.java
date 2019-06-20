@@ -78,8 +78,13 @@ public class BatchDocumentModelHandler extends NuxeoDocumentModelHandler<BatchCo
 
 		System.out.println("HEEEEERE inside supports invocationmode START ======");
 		boolean result = false;
+
+		String invocationMode = "PLACEHOLDER";
+		System.out.println(invocationCtx.getMode());
+		invocationMode = invocationCtx.getMode().toLowerCase();
+		System.out.println(invocationMode);
+		System.out.println("IS IT NULL? ?? ^^^");
 		
-		String invocationMode = invocationCtx.getMode().toLowerCase();
 		if (BatchInvocable.INVOCATION_MODE_SINGLE.equalsIgnoreCase(invocationMode)) {
 			result = batchCommon.isSupportsSingleDoc(); //BatchJAXBSchema.SUPPORTS_SINGLE_DOC;
 		} else if (BatchInvocable.INVOCATION_MODE_LIST.equalsIgnoreCase(invocationMode)) {
