@@ -84,14 +84,29 @@ public class BatchDocumentModelHandler extends NuxeoDocumentModelHandler<BatchCo
 		invocationMode = invocationCtx.getMode().toLowerCase();
 		System.out.println(invocationMode);
 		System.out.println("IS IT NULL? ?? ^^^");
+
 		
+		System.out.println(BatchInvocable.INVOCATION_MODE_SINGLE.equalsIgnoreCase(invocationMode));
+		System.out.println(BatchInvocable.INVOCATION_MODE_LIST.equalsIgnoreCase(invocationMode));
+		System.out.println(BatchInvocable.INVOCATION_MODE_GROUP.equalsIgnoreCase(invocationMode));
+		System.out.println(Invocable.INVOCATION_MODE_NO_CONTEXT.equalsIgnoreCase(invocationMode));
+		
+		System.out.println(BatchInvocable.INVOCATION_MODE_SINGLE); 
+		System.out.println(BatchInvocable.INVOCATION_MODE_LIST); 
+		System.out.println(BatchInvocable.INVOCATION_MODE_GROUP); 
+		System.out.println(Invocable.INVOCATION_MODE_NO_CONTEXT); 
+
 		if (BatchInvocable.INVOCATION_MODE_SINGLE.equalsIgnoreCase(invocationMode)) {
+			System.out.println("here");
 			result = batchCommon.isSupportsSingleDoc(); //BatchJAXBSchema.SUPPORTS_SINGLE_DOC;
 		} else if (BatchInvocable.INVOCATION_MODE_LIST.equalsIgnoreCase(invocationMode)) {
+			System.out.println("here 2");
 			result = batchCommon.isSupportsDocList(); //BatchJAXBSchema.SUPPORTS_DOC_LIST;
 		} else if (BatchInvocable.INVOCATION_MODE_GROUP.equalsIgnoreCase(invocationMode)) {
+			System.out.println("here 3");
 			result = batchCommon.isSupportsGroup(); //BatchJAXBSchema.SUPPORTS_GROUP;
 		} else if (Invocable.INVOCATION_MODE_NO_CONTEXT.equalsIgnoreCase(invocationMode)) {
+			System.out.println("here 4");
 			result = batchCommon.isSupportsNoContext(); //InvocableJAXBSchema.SUPPORTS_NO_CONTEXT;
 		} else {
 			String msg = String.format("BatchResource: Unknown invocation mode '%s' requested trying to invoke batch job '%s'.",
