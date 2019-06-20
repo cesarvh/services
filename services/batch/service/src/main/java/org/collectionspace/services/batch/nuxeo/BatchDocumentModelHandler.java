@@ -107,7 +107,10 @@ public class BatchDocumentModelHandler extends NuxeoDocumentModelHandler<BatchCo
 			result = batchCommon.isSupportsGroup(); //BatchJAXBSchema.SUPPORTS_GROUP;
 		} else if (Invocable.INVOCATION_MODE_NO_CONTEXT.equalsIgnoreCase(invocationMode)) {
 			System.out.println("here 4");
+			System.out.println(batchCommon.isSupportsNoContext());
+			
 			result = batchCommon.isSupportsNoContext(); //InvocableJAXBSchema.SUPPORTS_NO_CONTEXT;
+			
 		} else {
 			String msg = String.format("BatchResource: Unknown invocation mode '%s' requested trying to invoke batch job '%s'.",
 					invocationMode, batchCommon.getName());
