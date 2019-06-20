@@ -320,6 +320,9 @@ public class BatchDocumentModelHandler extends NuxeoDocumentModelHandler<BatchCo
 			if (logger.isDebugEnabled()) {
 				logger.debug("BatchResource: Caught exception ", e);
 			}
+			System.out.println("====BATCH DOCMODELHANDLER START====");
+			e.printStackTrace();
+			System.out.println("====BATCH DOCMODELHANDLER END====");
 			throw new DocumentException(e);
 		} finally {
 			if (releaseRepoSession && repoSession != null) {

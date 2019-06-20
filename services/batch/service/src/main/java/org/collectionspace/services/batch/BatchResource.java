@@ -201,11 +201,18 @@ public class BatchResource extends NuxeoBasedResource {
 
 	private BatchCommon getBatchCommon(String csid) throws Exception {
 		BatchCommon result = null;
+        System.out.println("GET BATCH COMMON IN BATCH RESOURCE START");
 
-    	ServiceContext<PoxPayloadIn, PoxPayloadOut> ctx = createServiceContext();
-		PoxPayloadOut ppo = get(csid, ctx);
-		PayloadPart batchCommonPart = ppo.getPart(BatchClient.SERVICE_COMMON_PART_NAME);
-		result = (BatchCommon)batchCommonPart.getBody();
+        ServiceContext<PoxPayloadIn, PoxPayloadOut> ctx = createServiceContext();
+        System.out.println(ctx);
+        PoxPayloadOut ppo = get(csid, ctx);
+        System.out.println(ppo);
+        PayloadPart batchCommonPart = ppo.getPart(BatchClient.SERVICE_COMMON_PART_NAME);
+        System.out.println(batchCommonPart);
+        result = (BatchCommon)batchCommonPart.getBody();
+        System.out.println(result);
+        
+        System.out.println("GET BATCH COMMON IN BATCH RESOURCE END");
 
     	return result;
     }
@@ -221,13 +228,16 @@ public class BatchResource extends NuxeoBasedResource {
         try {
             ServiceContext<PoxPayloadIn, PoxPayloadOut> ctx = createServiceContext(ui);
             BatchDocumentModelHandler handler = (BatchDocumentModelHandler)createDocumentHandler(ctx);
-            System.out.println("ctx: " + ctx);
-            System.out.println("csid: " + csid);
-            System.out.println("resourceMap: " + resourceMap.toString());
-            System.out.println("inv context: " + (String) invContext);
+            System.out.println("=====BATCH RESOURCE START====");
+            System.err.println("ctx: " + ctx);
+            System.err.println("csid: " + csid);
+            System.err.println("resourceMap: " + resourceMap.toString());
+            System.err.println("inv context: " + invContext);
+            System.out.println("=====BATCH RESOURCE END====");
 
             return handler.invokeBatchJob(ctx, csid, resourceMap, invContext, getBatchCommon(csid));
         } catch (Exception e) {
+            e.printStackTrace();
             
 
         	String msg = String.format("%s Could not invoke batch job with CSID='%s'.",
