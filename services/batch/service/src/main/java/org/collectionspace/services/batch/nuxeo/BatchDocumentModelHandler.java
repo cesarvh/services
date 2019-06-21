@@ -77,6 +77,7 @@ public class BatchDocumentModelHandler extends NuxeoDocumentModelHandler<BatchCo
 	protected boolean supportsInvokationMode(InvocationContext invocationCtx, BatchCommon batchCommon) throws BadRequestException {
 
 		System.out.println("HEEEEERE inside supports invocationmode START ======");
+		System.out.println(batchCommon);
 		boolean result = false;
 
 		String invocationMode = "PLACEHOLDER";
@@ -91,10 +92,10 @@ public class BatchDocumentModelHandler extends NuxeoDocumentModelHandler<BatchCo
 		System.out.println(BatchInvocable.INVOCATION_MODE_GROUP.equalsIgnoreCase(invocationMode));
 		System.out.println(Invocable.INVOCATION_MODE_NO_CONTEXT.equalsIgnoreCase(invocationMode));
 		
-		System.out.println(BatchInvocable.INVOCATION_MODE_SINGLE); 
-		System.out.println(BatchInvocable.INVOCATION_MODE_LIST); 
-		System.out.println(BatchInvocable.INVOCATION_MODE_GROUP); 
-		System.out.println(Invocable.INVOCATION_MODE_NO_CONTEXT); 
+		System.out.println(batchCommon.isSupportsSingleDoc()); 
+		System.out.println(batchCommon.isSupportsDocList()); 
+		System.out.println(batchCommon.isSupportsGroup()); 
+		System.out.println(batchCommon.isSupportsNoContext()); 
 
 		if (BatchInvocable.INVOCATION_MODE_SINGLE.equalsIgnoreCase(invocationMode)) {
 			System.out.println("here");
@@ -108,7 +109,7 @@ public class BatchDocumentModelHandler extends NuxeoDocumentModelHandler<BatchCo
 		} else if (Invocable.INVOCATION_MODE_NO_CONTEXT.equalsIgnoreCase(invocationMode)) {
 			System.out.println("here 4");
 			System.out.println(batchCommon.isSupportsNoContext());
-			
+
 			result = batchCommon.isSupportsNoContext(); //InvocableJAXBSchema.SUPPORTS_NO_CONTEXT;
 			
 		} else {
