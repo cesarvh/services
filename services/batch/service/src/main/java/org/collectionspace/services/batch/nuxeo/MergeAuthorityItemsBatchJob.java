@@ -71,12 +71,22 @@ public class MergeAuthorityItemsBatchJob extends AbstractBatchJob {
 	public void run() {
 		setCompletionStatus(STATUS_MIN_PROGRESS);
 
+		String mode = getInvocationContext().getMode(); 
+
+		// if (INVOCATION_MODE_LIST.equalsIgnoreCase(invocationCtx.getMode())) {
+
+		// }
+		// if(INVOCATION_MODE_SINGLE.equalsIgnoreCase(invocationCtx.getMode())) {
+
 		try {
 			String docType = null;
 			String targetCsid = null;
 			List<String> sourceCsids = new ArrayList<String>();
 
+
 			for (Param param : this.getParams()) {
+				System.out.println(param.getValue());
+				logger.debug(param.getValue());
 				String key = param.getKey();
 
 				// I don't want this batch job to appear in the UI, since it won't run successfully without parameters.
@@ -95,12 +105,22 @@ public class MergeAuthorityItemsBatchJob extends AbstractBatchJob {
 				}
 			}
 
+			if (mode.equalsIgnoreCase(INVOCATION_MODE_LIST)) {
+				// Now that these appear in the UI, we can fetch the docType and the sourceCSIDlists 
+				if (docType == null) {
+					docType = invocationCtx.getDocType();
+				}
+				if (sourceCsids.size() == 0) {
+					sourceCsids = this.getListCsids();
+				}
+			}
+
 			if (docType == null || docType.equals("")) {
 				throw new Exception("a docType must be supplied");
 			}
 
 			if (targetCsid == null || targetCsid.equals("")) {
-				throw new Exception("a target csid parameter (targetCSID) must be supplied");
+				throw new Exception("a target csid parameter (targetCSID) must be supplied docType is " + docType + " Source is " + sourceCsids.toString() + " and target " + targetCsid + "\n The mode is " + mode + "\n and under docType " + invocationCtx.getDocType() + " For CSIDs: " + this.getListCsids());
 			}
 
 			if (sourceCsids.size() == 0) {
