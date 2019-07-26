@@ -73,11 +73,6 @@ public class MergeAuthorityItemsBatchJob extends AbstractBatchJob {
 
 		String mode = getInvocationContext().getMode(); 
 
-		// if (INVOCATION_MODE_LIST.equalsIgnoreCase(invocationCtx.getMode())) {
-
-		// }
-		// if(INVOCATION_MODE_SINGLE.equalsIgnoreCase(invocationCtx.getMode())) {
-
 		try {
 			String docType = null;
 			String targetCsid = null;
@@ -85,8 +80,6 @@ public class MergeAuthorityItemsBatchJob extends AbstractBatchJob {
 
 
 			for (Param param : this.getParams()) {
-				System.out.println(param.getValue());
-				logger.debug(param.getValue());
 				String key = param.getKey();
 
 				// I don't want this batch job to appear in the UI, since it won't run successfully without parameters.
@@ -120,7 +113,7 @@ public class MergeAuthorityItemsBatchJob extends AbstractBatchJob {
 			}
 
 			if (targetCsid == null || targetCsid.equals("")) {
-				throw new Exception("a target csid parameter (targetCSID) must be supplied docType is " + docType + " Source is " + sourceCsids.toString() + " and target " + targetCsid + "\n The mode is " + mode + "\n and under docType " + invocationCtx.getDocType() + " For CSIDs: " + this.getListCsids());
+				throw new Exception("a target csid parameter (targetCSID) must be supplied.");
 			}
 
 			if (sourceCsids.size() == 0) {
