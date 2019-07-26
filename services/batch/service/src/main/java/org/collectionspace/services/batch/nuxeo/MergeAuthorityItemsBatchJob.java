@@ -116,9 +116,15 @@ public class MergeAuthorityItemsBatchJob extends AbstractBatchJob {
 				throw new Exception("a target csid parameter (targetCSID) must be supplied.");
 			}
 
+			if (sourceCsids.contains(targetCsid)) {
+				sourceCsids.remove(targetCsid);
+				logger.warn("Attempted to merge targetCSID of " + targetCSID + " with itself. The record has been removed from the sourceCSIDs list.");
+			}
+
 			if (sourceCsids.size() == 0) {
 				throw new Exception("a source csid must be supplied");
 			}
+			
 
 			InvocationResults results = merge(docType, targetCsid, sourceCsids);
 
