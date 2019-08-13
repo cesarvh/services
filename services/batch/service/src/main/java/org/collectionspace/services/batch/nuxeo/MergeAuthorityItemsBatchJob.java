@@ -114,11 +114,8 @@ public class MergeAuthorityItemsBatchJob extends AbstractBatchJob {
 				docType = invocationCtx.getDocType();
 			}
 
-			if (mode.equalsIgnoreCase(INVOCATION_MODE_LIST)) {
-				// Now that these appear in the UI, we can fetch the docType and the sourceCSIDlists 
-				if (sourceCsids.size() == 0) {
-					sourceCsids = this.getListCsids();
-				}
+			if (sourceCsids.size() == 0) {
+				sourceCsids = this.getListCsids();
 			}
 
 			if (docType == null || docType.equals("")) {
