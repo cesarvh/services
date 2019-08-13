@@ -109,14 +109,27 @@ public class MergeAuthorityItemsBatchJob extends AbstractBatchJob {
 					sourceCsids.add(param.getValue());
 				}
 			}
+			logger.warn("=== START ===");
+			logger.warn("The mode is " + mode);
+			logger.warn("The csid is: " + sourceCsids.toString() + " with the passed in docType " + docType + " along with the context doctype " + invocationCtx.getDocType());
 
-			if (docType == null) {
-				docType = invocationCtx.getDocType();
+
+			if (mode.equalsIgnoreCase(INVOCATION_MODE_LIST)) {
+				// Now that these appear in the UI, we can fetch the docType and the sourceCSIDlists 
+
+				// FIX ME
+				if (docType == null) {
+					docType = invocationCtx.getDocType();
+				}
+				if (sourceCsids.size() == 0) {
+					sourceCsids = this.getListCsids();
+				}
 			}
 
-			if (sourceCsids.size() == 0) {
-				sourceCsids = this.getListCsids();
-			}
+			logger.warn("=== CONT... ===");
+			logger.warn("The mode is " + mode);
+			logger.warn("The csid is: " + sourceCsids.toString() + " with the passed in docType " + docType + " along with the context doctype " + invocationCtx.getDocType());
+			logger.warn("==== END ===");
 
 			if (docType == null || docType.equals("")) {
 				throw new Exception("a docType must be supplied");
