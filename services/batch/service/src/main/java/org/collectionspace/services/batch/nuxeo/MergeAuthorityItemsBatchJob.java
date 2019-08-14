@@ -118,12 +118,16 @@ public class MergeAuthorityItemsBatchJob extends AbstractBatchJob {
 				// Now that these appear in the UI, we can fetch the docType and the sourceCSIDlists 
 
 				// FIX ME
-				if (docType == null) {
-					docType = invocationCtx.getDocType();
-				}
 				if (sourceCsids.size() == 0) {
 					sourceCsids = this.getListCsids();
 				}
+			} else {
+				// invocation mode single
+				sourceCsids.add(invocationCtx.getSingleCSID());
+			}
+
+			if (docType == null) {
+				docType = invocationCtx.getDocType();
 			}
 
 			logger.warn("=== CONT... ===");
