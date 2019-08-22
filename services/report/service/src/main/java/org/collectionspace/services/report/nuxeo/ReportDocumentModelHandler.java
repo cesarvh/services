@@ -155,6 +155,9 @@ public class ReportDocumentModelHandler extends NuxeoDocumentModelHandler<Report
 			InvocationContext invContext,
 			StringBuffer outMimeType,
 			StringBuffer outReportFileName) throws Exception {
+
+				logger.warn(outMimeType.toString());
+
 		CoreSessionInterface repoSession = null;
 		boolean releaseRepoSession = false;
 
@@ -233,7 +236,10 @@ public class ReportDocumentModelHandler extends NuxeoDocumentModelHandler<Report
 			//
 	    	// If the invocation context contains a MIME type then use it.  Otherwise, look in the report resource.  If no MIME type in the report resource,
 	    	// use the default MIME type.
-	    	//
+				//
+				logger.warn("The mime type is " + invContext.getOutputMIME());
+				logger.warn("The inv context is " + invContext.toString());
+
 	    	if (!Tools.isEmpty(invContext.getOutputMIME())) {
 	    		outMimeType.append(invContext.getOutputMIME());
 	    	}
