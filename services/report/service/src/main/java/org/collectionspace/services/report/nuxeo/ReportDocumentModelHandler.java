@@ -240,7 +240,7 @@ public class ReportDocumentModelHandler extends NuxeoDocumentModelHandler<Report
 				logger.warn("The mime type is " + invContext.getOutputMIME());
 				
 				logger.warn("The inv context is " + invContext.toString());
-				logger.warn("The params context is " + invContext.getParams().toString());
+				logger.warn("The params context is " + (Map<String, Object>)invContext.getParams());
 	    	if (!Tools.isEmpty(invContext.getOutputMIME())) {
 	    		outMimeType.append(invContext.getOutputMIME());
 	    	}
