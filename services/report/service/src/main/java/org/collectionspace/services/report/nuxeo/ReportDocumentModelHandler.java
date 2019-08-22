@@ -164,11 +164,14 @@ public class ReportDocumentModelHandler extends NuxeoDocumentModelHandler<Report
 		String invocationMode = invContext.getMode();
 		String modeProperty = null;
 		HashMap<String, Object> params = new HashMap<String, Object>();
+
 		params.put(REPORTS_STD_TENANTID_PARAM, ctx.getTenantId());
 		boolean checkDocType = true;
 		
 		// Note we set before we put in the default ones, so they cannot override tenant or CSID.
 		setParamsFromContext(params, invContext);
+
+		logger.warn(params.toString());
 		
 		if(Invocable.INVOCATION_MODE_SINGLE.equalsIgnoreCase(invocationMode)) {
 			modeProperty = InvocableJAXBSchema.SUPPORTS_SINGLE_DOC;
