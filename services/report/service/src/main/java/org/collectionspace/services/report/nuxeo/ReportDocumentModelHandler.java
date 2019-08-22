@@ -238,8 +238,9 @@ public class ReportDocumentModelHandler extends NuxeoDocumentModelHandler<Report
 	    	// use the default MIME type.
 				//
 				logger.warn("The mime type is " + invContext.getOutputMIME());
+				
 				logger.warn("The inv context is " + invContext.toString());
-
+				logger.warn("The inv context is " + invContext.getParameters());
 	    	if (!Tools.isEmpty(invContext.getOutputMIME())) {
 	    		outMimeType.append(invContext.getOutputMIME());
 	    	}
