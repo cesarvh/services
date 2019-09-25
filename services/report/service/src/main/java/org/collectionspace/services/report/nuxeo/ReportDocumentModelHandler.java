@@ -147,7 +147,28 @@ public class ReportDocumentModelHandler extends NuxeoDocumentModelHandler<Report
         }
 
         return result;
-    }
+		}
+	
+		private String printInvocationContext(InvocationContext invContext, Map<String, Object> params) {
+			String outputMIME = invContext.getOutputMIME();
+			String mode = invContext.getMode();
+			String updateCoreValues = invContext.getUpdateCoreValues();
+			String docType = invContext.getDocType();
+			String singleCSID = invContext.getSingleCSID();
+			String groupCSID = invContext.getGroupCSID();
+			String listCSIDs = invContext.getListCSIDs() == null ? "" : invContext.getListCSIDs().toString();
+
+			String result =
+					"{MIME type: "  + outputMIME + 
+					"\n \t Context mode: " + mode +
+					"\n \t Update Core Values: " + updateCoreValues +
+					"\n \t Document type: " + docType +
+					"\n \t CSID: " + singleCSID +
+					"\n \t Group CSID: " + groupCSID +
+					"\n \t List CSIDs: " + listCSIDs +
+					"\n \t Parameters: " + params.toString() + "}";
+			return result; 
+		}
     
 	public InputStream invokeReport(
 			ServiceContext<PoxPayloadIn, PoxPayloadOut> ctx,
@@ -155,7 +176,8 @@ public class ReportDocumentModelHandler extends NuxeoDocumentModelHandler<Report
 			InvocationContext invContext,
 			StringBuffer outMimeType,
 			StringBuffer outReportFileName) throws Exception {
-
+		
+			
 		CoreSessionInterface repoSession = null;
 		boolean releaseRepoSession = false;
 
@@ -203,6 +225,9 @@ public class ReportDocumentModelHandler extends NuxeoDocumentModelHandler<Report
 			throw new BadRequestException("ReportResource: unknown Invocation Mode: "
         			+invocationMode);
 		}
+		logger.warn("The invocation context is: \n " + printInvocationContext(invContext, params));
+		logger.warn("The report is being called with the following parameters: \n" + params.toString());
+
 		
 		NuxeoRepositoryClientImpl repoClient = (NuxeoRepositoryClientImpl)this.getRepositoryClient(ctx);
 		repoSession = this.getRepositorySession();
@@ -401,6 +426,7 @@ public class ReportDocumentModelHandler extends NuxeoDocumentModelHandler<Report
 			tempOutputStream.close();
 			
 			result = new FileInputStream(tempOutputFile);
+
 	       	return result;
         } catch (SQLException sqle) {
             // SQLExceptions can be chained. We have at least one exception, so
