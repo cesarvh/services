@@ -35,9 +35,43 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import javax.ws.rs.core.MediaType;
 import javax.naming.NamingException;
+import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
+
+import org.collectionspace.services.ReportJAXBSchema;
+import org.collectionspace.services.client.PoxPayloadIn;
+import org.collectionspace.services.client.PoxPayloadOut;
+import org.collectionspace.services.client.ReportClient;
+import org.collectionspace.services.common.CSWebApplicationException;
+import org.collectionspace.services.common.ServiceMain;
+import org.collectionspace.services.common.api.FileTools;
+import org.collectionspace.services.common.api.JEEServerDeployment;
+import org.collectionspace.services.common.api.Tools;
+import org.collectionspace.services.common.config.TenantBindingConfigReaderImpl;
+import org.collectionspace.services.common.context.ServiceBindingUtils;
+import org.collectionspace.services.common.context.ServiceContext;
+import org.collectionspace.services.common.document.BadRequestException;
+import org.collectionspace.services.common.document.DocumentException;
+import org.collectionspace.services.common.document.DocumentWrapper;
+import org.collectionspace.services.common.invocable.Invocable;
+import org.collectionspace.services.common.storage.JDBCTools;
+import org.collectionspace.services.config.service.ServiceBindingType;
+import org.collectionspace.services.config.types.PropertyItemType;
+import org.collectionspace.services.jaxb.InvocableJAXBSchema;
+import org.collectionspace.services.nuxeo.client.java.CoreSessionInterface;
+import org.collectionspace.services.nuxeo.client.java.NuxeoDocumentModelHandler;
+import org.collectionspace.services.nuxeo.client.java.NuxeoRepositoryClientImpl;
+import org.collectionspace.services.nuxeo.util.NuxeoUtils;
+import org.collectionspace.services.report.MIMEType;
+import org.collectionspace.services.report.MIMETypeItemType;
+import org.collectionspace.services.report.ReportsCommon;
+import org.collectionspace.services.report.ReportsOuputMimeList;
+import org.jfree.util.Log;
+import org.nuxeo.ecm.core.api.DocumentModel;
+import org.nuxeo.ecm.core.api.model.PropertyException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import net.sf.jasperreports.engine.JRException;
 import net.sf.jasperreports.engine.JRExporter;
@@ -54,44 +88,6 @@ import net.sf.jasperreports.engine.export.JRXmlExporter;
 import net.sf.jasperreports.engine.export.ooxml.JRDocxExporter;
 import net.sf.jasperreports.engine.export.ooxml.JRPptxExporter;
 import net.sf.jasperreports.engine.export.ooxml.JRXlsxExporter;
-
-import org.collectionspace.services.ReportJAXBSchema;
-import org.collectionspace.services.report.MIMEType;
-import org.collectionspace.services.report.MIMETypeItemType;
-import org.collectionspace.services.report.ReportsCommon;
-import org.collectionspace.services.report.ReportsOuputMimeList;
-import org.collectionspace.services.client.PoxPayloadIn;
-import org.collectionspace.services.client.PoxPayloadOut;
-import org.collectionspace.services.client.ReportClient;
-import org.collectionspace.services.common.CSWebApplicationException;
-import org.collectionspace.services.common.ServiceMain;
-import org.collectionspace.services.common.api.JEEServerDeployment;
-import org.collectionspace.services.common.api.FileTools;
-import org.collectionspace.services.common.api.Tools;
-import org.collectionspace.services.common.config.TenantBindingConfigReaderImpl;
-import org.collectionspace.services.common.context.ServiceBindingUtils;
-import org.collectionspace.services.common.context.ServiceContext;
-import org.collectionspace.services.common.document.BadRequestException;
-import org.collectionspace.services.common.document.DocumentException;
-import org.collectionspace.services.common.document.DocumentWrapper;
-import org.collectionspace.services.common.invocable.Invocable;
-import org.collectionspace.services.common.invocable.InvocationContext;
-import org.collectionspace.services.common.storage.JDBCTools;
-import org.collectionspace.services.config.service.ServiceBindingType;
-import org.collectionspace.services.config.types.PropertyItemType;
-import org.collectionspace.services.jaxb.InvocableJAXBSchema;
-import org.collectionspace.services.nuxeo.client.java.NuxeoDocumentModelHandler;
-import org.collectionspace.services.nuxeo.client.java.CoreSessionInterface;
-import org.collectionspace.services.nuxeo.client.java.NuxeoRepositoryClientImpl;
-import org.collectionspace.services.nuxeo.util.NuxeoUtils;
-
-import org.jfree.util.Log;
-
-import org.nuxeo.ecm.core.api.model.PropertyException;
-import org.nuxeo.ecm.core.api.DocumentModel;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * ReportDocumentModelHandler
@@ -147,7 +143,28 @@ public class ReportDocumentModelHandler extends NuxeoDocumentModelHandler<Report
         }
 
         return result;
-    }
+		}
+	
+		private String printInvocationContext(InvocationContext invContext, Map<String, Object> params) {
+			String outputMIME = invContext.getOutputMIME();
+			String mode = invContext.getMode();
+			String updateCoreValues = invContext.getUpdateCoreValues();
+			String docType = invContext.getDocType();
+			String singleCSID = invContext.getSingleCSID();
+			String groupCSID = invContext.getGroupCSID();
+			String listCSIDs = invContext.getListCSIDs() == null ? "" : invContext.getListCSIDs().toString();
+
+			String result =
+					"{MIME type: "  + outputMIME + 
+					"\n \t Context mode: " + mode +
+					"\n \t Update Core Values: " + updateCoreValues +
+					"\n \t Document type: " + docType +
+					"\n \t CSID: " + singleCSID +
+					"\n \t Group CSID: " + groupCSID +
+					"\n \t List CSIDs: " + listCSIDs +
+					"\n \t Parameters: " + params.toString() + "}";
+			return result; 
+		}
     
 	public InputStream invokeReport(
 			ServiceContext<PoxPayloadIn, PoxPayloadOut> ctx,
@@ -155,7 +172,8 @@ public class ReportDocumentModelHandler extends NuxeoDocumentModelHandler<Report
 			InvocationContext invContext,
 			StringBuffer outMimeType,
 			StringBuffer outReportFileName) throws Exception {
-
+		
+			
 		CoreSessionInterface repoSession = null;
 		boolean releaseRepoSession = false;
 
@@ -203,6 +221,9 @@ public class ReportDocumentModelHandler extends NuxeoDocumentModelHandler<Report
 			throw new BadRequestException("ReportResource: unknown Invocation Mode: "
         			+invocationMode);
 		}
+		logger.log("The invocation context is: \n " + printInvocationContext(invContext, params));
+		logger.debug("The report is being called with the following parameters, which are being passed to Jasper: \n" + params.toString());
+		logger.debug("The mode being passed to Jasper is: " + invocationMode);
 		
 		NuxeoRepositoryClientImpl repoClient = (NuxeoRepositoryClientImpl)this.getRepositoryClient(ctx);
 		repoSession = this.getRepositorySession();
@@ -401,6 +422,7 @@ public class ReportDocumentModelHandler extends NuxeoDocumentModelHandler<Report
 			tempOutputStream.close();
 			
 			result = new FileInputStream(tempOutputFile);
+
 	       	return result;
         } catch (SQLException sqle) {
             // SQLExceptions can be chained. We have at least one exception, so
