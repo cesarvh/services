@@ -155,6 +155,8 @@ public class ReportDocumentModelHandler extends NuxeoDocumentModelHandler<Report
 			InvocationContext invContext,
 			StringBuffer outMimeType,
 			StringBuffer outReportFileName) throws Exception {
+		
+		logger.warn("Invoking report with csid=" + csid with the mode + " " + invContext.getMode());
 
 		CoreSessionInterface repoSession = null;
 		boolean releaseRepoSession = false;
@@ -168,6 +170,9 @@ public class ReportDocumentModelHandler extends NuxeoDocumentModelHandler<Report
 		
 		// Note we set before we put in the default ones, so they cannot override tenant or CSID.
 		setParamsFromContext(params, invContext);
+
+		logger.warn("The params are: " + params.toString());
+		logger.warn(invContext.toString());
 		
 		if(Invocable.INVOCATION_MODE_SINGLE.equalsIgnoreCase(invocationMode)) {
 			modeProperty = InvocableJAXBSchema.SUPPORTS_SINGLE_DOC;
@@ -203,6 +208,9 @@ public class ReportDocumentModelHandler extends NuxeoDocumentModelHandler<Report
 			throw new BadRequestException("ReportResource: unknown Invocation Mode: "
         			+invocationMode);
 		}
+		logger.warn("=-======");
+		logger.warn("The report is being called with the following parameters: \n" + params.toString());
+
 		
 		NuxeoRepositoryClientImpl repoClient = (NuxeoRepositoryClientImpl)this.getRepositoryClient(ctx);
 		repoSession = this.getRepositorySession();
@@ -401,6 +409,7 @@ public class ReportDocumentModelHandler extends NuxeoDocumentModelHandler<Report
 			tempOutputStream.close();
 			
 			result = new FileInputStream(tempOutputFile);
+
 	       	return result;
         } catch (SQLException sqle) {
             // SQLExceptions can be chained. We have at least one exception, so
