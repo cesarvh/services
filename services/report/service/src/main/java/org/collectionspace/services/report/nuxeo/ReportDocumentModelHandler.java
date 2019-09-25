@@ -156,7 +156,7 @@ public class ReportDocumentModelHandler extends NuxeoDocumentModelHandler<Report
 			StringBuffer outMimeType,
 			StringBuffer outReportFileName) throws Exception {
 		
-		logger.warn("Invoking report with csid=" + csid with the mode + " " + invContext.getMode());
+		logger.warn("Invoking report with csid=" + csid + " with the mode " + invContext.getMode());
 
 		CoreSessionInterface repoSession = null;
 		boolean releaseRepoSession = false;
