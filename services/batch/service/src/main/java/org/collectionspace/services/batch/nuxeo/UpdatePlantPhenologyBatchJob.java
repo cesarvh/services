@@ -16,6 +16,7 @@ import org.collectionspace.services.collectionobject.nuxeo.CollectionObjectBotGa
 import org.collectionspace.services.collectionobject.nuxeo.CollectionObjectConstants;
 import org.collectionspace.services.common.NuxeoBasedResource;
 import org.collectionspace.services.common.api.RefName;
+import org.collectionspace.services.common.invocable.InvocationContext;
 import org.collectionspace.services.common.invocable.InvocationContext.ListCSIDs;
 import org.collectionspace.services.common.invocable.InvocationResults;
 import org.collectionspace.services.taxonomy.nuxeo.TaxonBotGardenConstants;
@@ -36,7 +37,7 @@ public class UpdatePlantPhenologyBatchJob extends AbstractBatchJob {
   public void run() {
 
     try {
-      InvocationContext ctx = getInvocationContext()
+      InvocationContext ctx = getInvocationContext();
       String mode = ctx.getMode();
 
       if (mode.equalsIgnoreCase(INVOCATION_MODE_SINGLE)) {
