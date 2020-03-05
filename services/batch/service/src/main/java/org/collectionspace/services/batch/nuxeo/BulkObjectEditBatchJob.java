@@ -47,18 +47,18 @@ public class BulkObjectEditBatchJob extends  AbstractBatchJob {
         HashMap<String, String>  fieldsToValues = this.getValues();
         InvocationResults results = new InvocationResults();
 
-        
+
 
         if (fieldsToValues.isEmpty()) {
           throw new Exception("There is nothing to update. Aborting...");
         }
-        
+
         // setResults(updateRecords(csids, fieldsToValues));
-        
+
         int NumAffected = 0 ;
         String payload = preparePayload(fieldsToValues);
         PoxPayloadOut batchPayload = new PoxPayloadOut(payload.getBytes());
-        
+
         // PoxPayloadOut collectionObjectPayload = findCollectionObjectByCsid(collectionObjectCsid);
 
         for (String csid : csids) {
@@ -87,8 +87,8 @@ public class BulkObjectEditBatchJob extends  AbstractBatchJob {
     /* Values that will require special handing:
       pahma: inventoryCount, pahmaFieldLocVerbatim, pahmaEthnographicFileCodeList
       ucbnh naturalhistory: taxon
-    
-    */ 
+
+    */
 
 
     String commonValues = "";
@@ -102,7 +102,7 @@ public class BulkObjectEditBatchJob extends  AbstractBatchJob {
 
     for (String key : fieldsToUpdate.keySet()) {
       String value = fieldsToUpdate.get(key);
-      
+
       if (key.equals("material")) {
         commonValues += "<materialGroupList><materialGroup><" + key + ">" + value + "</" + key + "></materialGroup></materialGroupList>";
       } else if (key.equals("responsibleDepartment")) {
@@ -159,14 +159,14 @@ public class BulkObjectEditBatchJob extends  AbstractBatchJob {
     "<document name=\"collectionobjects\">" +
       "<ns2:collectionobjects_common " +
       "xmlns:ns2=\"http://collectionspace.org/services/collectionobject\" " +
-      "xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\">" + 
+      "xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\">" +
       commonValues +
     "</ns2:collectionobjects_common>";
 
     if (pahma) {
-      commonPayload += "<ns2:collectionobjects_pahma " + 
+      commonPayload += "<ns2:collectionobjects_pahma " +
                         "xmlns:ns2=\"http://collectionspace.org/services/collectionobject/local/pahma\" " +
-                        "xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\">" + pahmaValues + 
+                        "xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\">" + pahmaValues +
                         "</ns2:collectionobjects_pahma>";
     }
     if (ucbnh) {
@@ -199,7 +199,7 @@ public class BulkObjectEditBatchJob extends  AbstractBatchJob {
 
       Element e = elementList.get(elem);
 
-      
+
 
 
       // now we have both elements. Merge uwu
@@ -207,13 +207,13 @@ public class BulkObjectEditBatchJob extends  AbstractBatchJob {
 
     }
 
-    
+
 
 
     return "";
     // use result.asXML to get a final form
   }
-  
+
   public int updateRecord(String csid, String payload) throws URISyntaxException {
     PoxPayloadOut collectionObjectPayload = findCollectionObjectByCsid(csid);
 
