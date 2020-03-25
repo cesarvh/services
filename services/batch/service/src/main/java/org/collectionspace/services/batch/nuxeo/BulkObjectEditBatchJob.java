@@ -4,7 +4,7 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.net.URISyntaxException;
 import java.util.ArrayList;
-
+import java.util.List;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -47,18 +47,16 @@ public class BulkObjectEditBatchJob extends  AbstractBatchJob {
         HashMap<String, String>  fieldsToValues = this.getValues();
         InvocationResults results = new InvocationResults();
 
-
-
         if (fieldsToValues.isEmpty()) {
           throw new Exception("There is nothing to update. Aborting...");
         }
 
         // setResults(updateRecords(csids, fieldsToValues));
-
         int NumAffected = 0 ;
         String payload = preparePayload(fieldsToValues);
         PoxPayloadOut batchPayload = new PoxPayloadOut(payload.getBytes());
 
+        
         // PoxPayloadOut collectionObjectPayload = findCollectionObjectByCsid(collectionObjectCsid);
 
         for (String csid : csids) {
@@ -69,12 +67,15 @@ public class BulkObjectEditBatchJob extends  AbstractBatchJob {
               NumAffected += 1;
             } else {
               // Make this more obvious?
-              logger.warn("The recordw ith csid " +  csid + " was not updated");
+              logger.warn("The record with csid " +  csid + " was not updated");
             }
           }
         }
         setCompletionStatus(STATUS_COMPLETE);
+        results.setNumAffected(numAffected);
+        results.setUserNote("reindexed " + numAffected + " records");
 
+        setResults(results);
       } else {
         throw new Exception("Unsupported invocation mode " + mode);
       }
@@ -87,8 +88,8 @@ public class BulkObjectEditBatchJob extends  AbstractBatchJob {
     /* Values that will require special handing:
       pahma: inventoryCount, pahmaFieldLocVerbatim, pahmaEthnographicFileCodeList
       ucbnh naturalhistory: taxon
-
-    */
+    
+    */ 
 
 
     String commonValues = "";
@@ -102,7 +103,7 @@ public class BulkObjectEditBatchJob extends  AbstractBatchJob {
 
     for (String key : fieldsToUpdate.keySet()) {
       String value = fieldsToUpdate.get(key);
-
+      
       if (key.equals("material")) {
         commonValues += "<materialGroupList><materialGroup><" + key + ">" + value + "</" + key + "></materialGroup></materialGroupList>";
       } else if (key.equals("responsibleDepartment")) {
@@ -197,37 +198,66 @@ public class BulkObjectEditBatchJob extends  AbstractBatchJob {
 
       Element collectionObjectElement = collectionObjectPayload.getPart(elem).asElement();
 
-      Element e = elementList.get(elem);
+      Element batchElement = elementList.get(elem);
 
 
+//      collectionObjectPayload.addPart(); label, elementBody
+      for (Element batchElemChild : (List<Element>) batchElement.elements()) {
+        String childElemName = batchElemChild.getName(); // Now we need to find the matching element
 
+        if (childElemName == null) {continue;}
+
+
+//        Element collectionObjElement = collectionObjectElement.element("objectStatusList")
+        Element collectionObjElementList = collectionObjectElement.element(childElemName);
+
+//        if size of elements() below is 0, then it is non repeating, so just remove and set
+        for (Element objElem : (List<Element>) collectionObjElementList.elements()) {
+//          if elements is empty then its not a repeating list
+          // if the objElemName is in the list of singleFields...then dont add it but we can get to that later
+          batchElemChild.add(objElem.createCopy());
+        }
+
+        collectionObjectElement.remove(collectionObjElementList);
+        collectionObjectElement.add(batchElemChild.createCopy());
+//        collectionObjElement.add(batchElemChild.elements().get(0).createCopy());
+
+//        collectionObjectPayload.addPart(); label, elementBody
+//        PoxPayloadOut pLoad = collectionObjectPayload.addPart(childElemName, batchElemChild);
+
+//        collectionObjectElement
+
+//        collectionObjectElement.add(batchElemChild);
+//        public PayloadOutputPart addPart(String label, Element elementBody) {
+
+        int y = 0;
+
+      }
 
       // now we have both elements. Merge uwu
 
 
     }
 
+    
 
-
-
-    return "";
+    return collectionObjectPayload.asXML();
     // use result.asXML to get a final form
   }
-
-  public int updateRecord(String csid, String payload) throws URISyntaxException {
+  
+  public int updateRecord(String csid, String payload) throws URISyntaxException, DocumentException {
     PoxPayloadOut collectionObjectPayload = findCollectionObjectByCsid(csid);
 
     int result = 0;
 
-    ResourceMap resource = getResourceMap();
-    NuxeoBasedResource collectionObjectResource = (NuxeoBasedResource) resource.get(CollectionObjectClient.SERVICE_NAME);
+    try {
+      ResourceMap resource = getResourceMap();
+      NuxeoBasedResource collectionObjectResource = (NuxeoBasedResource) resource.get(CollectionObjectClient.SERVICE_NAME);
 
-    String response = new String (collectionObjectResource.update(getServiceContext(), resource, createUriInfo(), csid, payload));
-
-    if (response != "200") {
+      String response = new String(collectionObjectResource.update(getServiceContext(), resource, createUriInfo(), csid, payload));
+    } catch (Exception e) {
       result = -1;
     }
-
     return result;
 
   }
