@@ -16,7 +16,14 @@ import org.collectionspace.services.common.ResourceMap;
 import org.collectionspace.services.common.NuxeoBasedResource;
 
 import org.collectionspace.services.client.CollectionObjectClient;
+import org.collectionspace.services.client.PayloadOutputPart;
 import org.collectionspace.services.client.PoxPayloadOut;
+
+import org.dom4j.Document;
+import org.dom4j.DocumentException;
+import org.dom4j.DocumentHelper;
+import org.dom4j.Element;
+import org.dom4j.Node;
 
 public class BulkObjectEditBatchJob extends  AbstractBatchJob {
   final Logger logger = LoggerFactory.getLogger(BulkObjectEditBatchJob.class);
@@ -39,6 +46,7 @@ public class BulkObjectEditBatchJob extends  AbstractBatchJob {
         csids.addAll(ctx.getListCSIDs().getCsid());
         HashMap<String, String>  fieldsToValues = this.getValues();
         InvocationResults results = new InvocationResults();
+
         
 
         if (fieldsToValues.isEmpty()) {
@@ -49,13 +57,20 @@ public class BulkObjectEditBatchJob extends  AbstractBatchJob {
         
         int NumAffected = 0 ;
         String payload = preparePayload(fieldsToValues);
+        PoxPayloadOut batchPayload = new PoxPayloadOut(payload.getBytes());
+        
+        // PoxPayloadOut collectionObjectPayload = findCollectionObjectByCsid(collectionObjectCsid);
 
         for (String csid : csids) {
-          if (updateRecord(csid, payload) != -1) {
-            NumAffected += 1;
-          } else {
-            // Make this more obvious?
-            logger.warn("The recordw ith csid " +  csid + " was not updated");
+          String mergedPayload = mergePayloads(csid, batchPayload);
+
+          if (mergedPayload != null) {
+            if(updateRecord(csid, mergedPayload) != -1) {
+              NumAffected += 1;
+            } else {
+              // Make this more obvious?
+              logger.warn("The recordw ith csid " +  csid + " was not updated");
+            }
           }
         }
         setCompletionStatus(STATUS_COMPLETE);
@@ -72,15 +87,6 @@ public class BulkObjectEditBatchJob extends  AbstractBatchJob {
     /* Values that will require special handing:
       pahma: inventoryCount, pahmaFieldLocVerbatim, pahmaEthnographicFileCodeList
       ucbnh naturalhistory: taxon
-
-      groups: We may have to merge these...
-        - objectProductionPlaceGroupList > objectProductionPlaceGroup > objectProductionPlace
-        - objectProductionPersonGroupList > objectProductionPersonGrou > objectProductionPerson
-        - assocPeopleGroupList > assocPeopleGroup > assocPeople
-        - taxonomicIdentGroupList > taxonomicIdentGroup > taxon
-        - materialGroupList > materialGroup > material
-        
-      
     
     */ 
 
@@ -91,25 +97,60 @@ public class BulkObjectEditBatchJob extends  AbstractBatchJob {
     Boolean pahma = false;
     Boolean ucbnh = false;
 
+    String otherNumber = "<otherNumberList><otherNumber>";
+    Boolean otherNumFlag = false;
+
     for (String key : fieldsToUpdate.keySet()) {
       String value = fieldsToUpdate.get(key);
-      if (key.equals("objectProductionPlaceGroup"))  {
-        commonValues += "<objectProductionPlaceGroupList><" + key + ">" + value + "<" + key + "/><objectProductionPlaceGroupList/>";
-      } else if (key.equals("objectProductionPersonGroup")) {
-        commonValues += "<objectProductionPersonGroupList><" + key + ">" + value + "<" + key + "/><objectProductionPersonGroupList/>";
-      } else if (key.equals("assocPeopleGroup")) {
-        commonValues += "<assocPeopleGroupList><" + key + ">" + value + "<" + key + "/><assocPeopleGroupList/>";
-      } else if (key.equals("taxonomicIdentGroupList")) {
-        ucbnhValues += "<taxonomicIdentGroup><" + key + ">" + value + "<" + key + "/><taxonomicIdentGroup/>";
-        ucbnh = true;
-      } else if (key.equals("materialGroup")) {
-        commonValues += "<materialGroupList><" + key + ">" + value + "<" + key + "/><materialGroupList/>";
-      } else if (key.equals("inventoryCount") || key.equals("pahmaFieldLocVerbatim") || key.equals("pahmaEthnographicFileCodeList")) {
-        pahmaValues += "<" + key + ">" + value + "</" + key + ">";
-        pahma = true;
+      
+      if (key.equals("material")) {
+        commonValues += "<materialGroupList><materialGroup><" + key + ">" + value + "</" + key + "></materialGroup></materialGroupList>";
+      } else if (key.equals("responsibleDepartment")) {
+        commonValues += "<responsibleDepartments><" + key + ">" + value + "</" + key + "></responsibleDepartments>";
+      } else if (key.equals("assocPeople")) {
+        commonValues += "<assocPeopleGroupList><assocPeopleGroup><" + key + ">" + value + "</" + key + "></assocPeopleGroup></assocPeopleGroupList>";
+      } else if (key.equals("objectProductionPerson")) {
+        commonValues += "<objectProductionPersonGroupList><objectProductionPersonGroup><" + key + ">" + value + "</" + key + "></objectProductionPersonGroup></objectProductionPersonGroupList>";
+      } else if (key.equals("objectProductionPlace")) {
+        commonValues += "<objectProductionPlaceGroupList><objectProductionPlaceGroup><" + key + ">" + value + "</" + key + "></objectProductionPlaceGroup></objectProductionPlaceGroupList>";
+      } else if (key.equals("fieldCollector")) {
+        commonValues += "<fieldCollectors><" + key + ">" + value + "</" + key + "></fieldCollectors>";
+      } else if (key.equals("objectStatus")) {
+        commonValues += "<objectStatusList><" + key + ">" + value + "</" + key + "></objectStatusList>";
+      } else if (key.equals("contentPlace")) {
+        commonValues += "<contentPlaces><" + key + ">" + value + "</" + key + "></contentPlaces>";
+      } else if (key.equals("objectName")) {
+        commonValues += "<objectNameList><objectNameGroup><" + key + ">" + value + "</" + key + "></objectNameGroup></objectNameList>";
+      } else if (key.equals("briefDescription")) {
+        commonValues += "<briefDescriptions><" + key + ">" + value + "</" + key + "></briefDescriptions>";
+      } else if (key.equals("numberValue") || key.equals("numberType")) {
+        otherNumber += "<" + key + ">" + value + "</" + key + ">";
+        otherNumFlag = true;
+      } else if (key.equals("objectProductionDate")) {
+        commonValues += "<objectProductionDateGroupList><objectProductionDateGroup><dateDisplayDate>" + value + "</dateDisplayDate></objectProductionDateGroup></objectProductionDateGroupList>";
+      } else if (key.equals("contentDate")) {
+        commonValues += "<contentDateGroup><dateDisplayDate>" + value + "</dateDisplayDate></contentDateGroup>";
+      } else if (key.equals("fieldCollectionDateGroup")) {
+          commonValues += "<fieldCollectionDateGroup><dateDisplayDate>" + value + "</dateDisplayDate></fieldCollectionDateGroup>";
       } else {
         commonValues += "<" + key + ">" + value + "</" + key + ">";
       }
+      // } else if (key.equals("taxonomicIdentGroupList")) {
+        // ucbnhValues += "<taxonomicIdentGroup><" + key + ">" + value + "<" + key + "/><taxonomicIdentGroup/>";
+        // ucbnh = true;
+      // } else if (key.equals("materialGroup")) {
+      //   commonValues += "<materialGroupList><" + key + ">" + value + "<" + key + "/><materialGroupList/>";
+      // } else if (key.equals("inventoryCount") || key.equals("pahmaFieldLocVerbatim") || key.equals("pahmaEthnographicFileCodeList")) {
+      //   pahmaValues += "<" + key + ">" + value + "</" + key + ">";
+      //   pahma = true;
+      // } else {
+      //   commonValues += "<" + key + ">" + value + "</" + key + ">";
+      // }
+    }
+
+    if (otherNumFlag) {
+      otherNumber += "</otherNumber></otherNumberList>";
+      commonValues += otherNumber;
     }
 
     String tenant = "";
@@ -141,8 +182,41 @@ public class BulkObjectEditBatchJob extends  AbstractBatchJob {
     return commonPayload;
   }
 
+  public String mergePayloads(String csid, PoxPayloadOut batchPayload) throws Exception {
+    // now we have the bytes for both t
+    HashMap<String, Element> elementList = new HashMap<String, Element>();
+    PoxPayloadOut collectionObjectPayload = findCollectionObjectByCsid(csid);
 
+    // Now we have a list of Elements that we can go thru and update
+    for (PayloadOutputPart candidatePart : batchPayload.getParts()) {
+      Element candidatePartElement = candidatePart.asElement();
+      elementList.put(candidatePartElement.getName(), candidatePartElement);
+    }
+
+    for (String elem : elementList.keySet()) {
+
+      Element collectionObjectElement = collectionObjectPayload.getPart(elem).asElement();
+
+      Element e = elementList.get(elem);
+
+      
+
+
+      // now we have both elements. Merge uwu
+
+
+    }
+
+    
+
+
+    return "";
+    // use result.asXML to get a final form
+  }
+  
   public int updateRecord(String csid, String payload) throws URISyntaxException {
+    PoxPayloadOut collectionObjectPayload = findCollectionObjectByCsid(csid);
+
     int result = 0;
 
     ResourceMap resource = getResourceMap();
