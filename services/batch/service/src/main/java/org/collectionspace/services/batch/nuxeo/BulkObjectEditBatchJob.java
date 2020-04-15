@@ -52,7 +52,7 @@ public class BulkObjectEditBatchJob extends  AbstractBatchJob {
         }
 
         // setResults(updateRecords(csids, fieldsToValues));
-        int NumAffected = 0 ;
+        int numAffected = 0 ;
         String payload = preparePayload(fieldsToValues);
         PoxPayloadOut batchPayload = new PoxPayloadOut(payload.getBytes());
 
@@ -64,7 +64,7 @@ public class BulkObjectEditBatchJob extends  AbstractBatchJob {
 
           if (mergedPayload != null) {
             if(updateRecord(csid, mergedPayload) != -1) {
-              NumAffected += 1;
+              numAffected += 1;
             } else {
               // Make this more obvious?
               logger.warn("The record with csid " +  csid + " was not updated");
