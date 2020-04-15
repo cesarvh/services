@@ -74,7 +74,7 @@ public class BulkObjectEditBatchJob extends  AbstractBatchJob {
         }
         setCompletionStatus(STATUS_COMPLETE);
         results.setNumAffected(numAffected);
-        results.setUserNote("reindexed " + numAffected + " records");
+        results.setUserNote("Updated " + numAffected + " records");
 
         setResults(results);
       } else {
@@ -201,55 +201,27 @@ public class BulkObjectEditBatchJob extends  AbstractBatchJob {
 
       Element batchElement = elementList.get(elem);
 
-
-//      collectionObjectPayload.addPart(); label, elementBody
       for (Element batchElemChild : (List<Element>) batchElement.elements()) {
         String childElemName = batchElemChild.getName(); // Now we need to find the matching element
 
         if (childElemName == null) {continue;}
 
 
-//        Element collectionObjElement = collectionObjectElement.element("objectStatusList")
         Element collectionObjElementList = collectionObjectElement.element(childElemName);
 
-//        if size of elements() below is 0, then it is non repeating, so just remove and set
         for (Element objElem : (List<Element>) collectionObjElementList.elements()) {
 //          if elements is empty then its not a repeating list
-          // if the objElemName is in the list of singleFields...then dont add it but we can get to that later
           batchElemChild.add(objElem.createCopy());
         }
 
         collectionObjectElement.remove(collectionObjElementList);
         collectionObjectElement.add(batchElemChild.createCopy());
-//        collectionObjElement.add(batchElemChild.elements().get(0).createCopy());
-
-//        collectionObjectPayload.addPart(); label, elementBody
-//        PoxPayloadOut pLoad = collectionObjectPayload.addPart(childElemName, batchElemChild);
-
-//        collectionObjectElement
-
-//        collectionObjectElement.add(batchElemChild);
-//        public PayloadOutputPart addPart(String label, Element elementBody) {
-
-        int y = 0;
 
       }
 
-      return collectionObjectPayload.asXML();
-
-      
-
-
-      // now we have both elements. Merge uwu
-
-
     }
 
-    
-
-
-    return "";
-    // use result.asXML to get a final form
+    return collectionObjectPayload.asXML();
   }
   
   public int updateRecord(String csid, String payload) throws URISyntaxException, DocumentException {
