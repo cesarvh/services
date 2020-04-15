@@ -56,12 +56,12 @@ public class BulkObjectEditBatchJob extends  AbstractBatchJob {
         // setResults(updateRecords(csids, fieldsToValues));
         int numAffected = 0 ;
         String payload = preparePayload(fieldsToValues);
-        PoxPayloadOut batchPayload = new PoxPayloadOut(payload.getBytes());
+        // PoxPayloadOut batchPayload;
         
         // PoxPayloadOut collectionObjectPayload = findCollectionObjectByCsid(collectionObjectCsid);
 
         for (String csid : csids) {
-          String mergedPayload = mergePayloads(csid, batchPayload);
+          String mergedPayload = mergePayloads(csid, new PoxPayloadOut(payload.getBytes()));
 
           if (mergedPayload != null) {
             if(updateRecord(csid, mergedPayload) != -1) {
@@ -186,36 +186,38 @@ public class BulkObjectEditBatchJob extends  AbstractBatchJob {
 
   public String mergePayloads(String csid, PoxPayloadOut batchPayload) throws Exception {
     // now we have the bytes for both t
-    HashMap<String, Element> elementList = new HashMap<String, Element>();
+    HashMap<String, Element> batchElementList = new HashMap<String, Element>();
     PoxPayloadOut collectionObjectPayload = findCollectionObjectByCsid(csid);
 
-    // Now we have a list of Elements that we can go thru and update
-    for (PayloadOutputPart candidatePart : batchPayload.getParts()) {
-      Element candidatePartElement = candidatePart.asElement();
-      elementList.put(candidatePartElement.getName(), candidatePartElement);
+    // Now we can go through the parts (_common, _pahma, _ucbnh)
+    for (PayloadOutputPart batchCandidatePart : batchPayload.getParts()) {
+      Element batchCandidatePartElement = batchCandidatePart.asElement();
+      batchElementList.put(batchCandidatePartElement.getName(), batchCandidatePartElement);
     }
 
-    for (String elem : elementList.keySet()) {
+    // now, for each (_common, _pahma, _ucbnh, we can iterate through each field)
+    for (String batchFieldElem : batchElementList.keySet()) {
 
-      Element collectionObjectElement = collectionObjectPayload.getPart(elem).asElement();
+      Element objectFieldElement = collectionObjectPayload.getPart(batchFieldElem).asElement();
 
-      Element batchElement = elementList.get(elem);
+      Element batchElement = batchElementList.get(batchFieldElem);
 
+      // Now for each 
       for (Element batchElemChild : (List<Element>) batchElement.elements()) {
         String childElemName = batchElemChild.getName(); // Now we need to find the matching element
 
         if (childElemName == null) {continue;}
 
 
-        Element collectionObjElementList = collectionObjectElement.element(childElemName);
+        Element collectionObjElementList = objectFieldElement.element(childElemName);
 
         for (Element objElem : (List<Element>) collectionObjElementList.elements()) {
 //          if elements is empty then its not a repeating list
           batchElemChild.add(objElem.createCopy());
         }
 
-        collectionObjectElement.remove(collectionObjElementList);
-        collectionObjectElement.add(batchElemChild.createCopy());
+        objectFieldElement.remove(collectionObjElementList);
+        objectFieldElement.add(batchElemChild.createCopy());
 
       }
 
@@ -225,7 +227,6 @@ public class BulkObjectEditBatchJob extends  AbstractBatchJob {
   }
   
   public int updateRecord(String csid, String payload) throws URISyntaxException, DocumentException {
-    PoxPayloadOut collectionObjectPayload = findCollectionObjectByCsid(csid);
 
     int result = 0;
 
