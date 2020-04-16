@@ -207,7 +207,9 @@ public class BulkObjectEditBatchJob extends  AbstractBatchJob {
 
         // If it is a repeated field, we will now merge the batch and the payloads
         for (Element objElem : (List<Element>) objectElementField.elements()) {
+          if (!objElem.getText().equals("")) {
             batchElementField.add(objElem.createCopy());
+          }
         }
 
         // If its not repeateable, we simply remove and replace

@@ -109,7 +109,6 @@ public class PoxPayloadOut extends PoxPayload<PayloadOutputPart> {
 		return result;
 	}
 	
-	          
 	/**
 	 * Adds a DOM4j Element part.
 	 *
