@@ -26,14 +26,13 @@ import org.dom4j.Element;
 /**
  * A batch job that updates the following fields:
  * collectionobject_common: numberOfObjects, numberValue, material, fieldCollectionPlace, responsibleDepartment, assocPeople, numberType, objectProductionPerson, objectProductionPlace, fieldCollector, objectStatus, contentPlace, objectName
- * collectionobject_naturalistory: taxon
- * collectionobject_pahma: pahmaEthnographicFileCodeList, pahmaFieldLocVerbatim, inventoryCount
  * The list contexts is
  *
  *
  * The following parameters are allowed:
  *
- * targetCSID: csid of target records, a dictionary of parameters (fields to update) and their new values 
+ * targetCSID: csid of target records, 
+ * params: a dictionary of parameters (fields to update) and their new values 
  *
  * @author Cesar Villalobos
  */
@@ -95,10 +94,6 @@ public class BulkObjectEditBatchJob extends  AbstractBatchJob {
   public String preparePayload(HashMap<String, String> fieldsToUpdate)  {
 
     String commonValues = "";
-    String ucbnhValues = "";
-    String pahmaValues = "";
-    Boolean pahma = false;
-    Boolean ucbnh = false;
 
     String otherNumber = "<otherNumberList><otherNumber>";
     Boolean otherNumFlag = false;
@@ -130,15 +125,6 @@ public class BulkObjectEditBatchJob extends  AbstractBatchJob {
       } else if (key.equals("numberValue") || key.equals("numberType")) {
         otherNumber += "<" + key + ">" + value + "</" + key + ">";
         otherNumFlag = true;
-      } else if (key.equals("taxon")) {
-        ucbnhValues += "<taxonomicIdentGroupList><taxonomicIdentGroup><" + key + ">" + value + "<" + key + "/></taxonomicIdentGroupList></taxonomicIdentGroup>";
-        ucbnh = true;
-      } else if (key.equals("inventoryCount") || key.equals("pahmaFieldLocVerbatim")) {
-        pahmaValues += "<" + key + ">" + value + "</" + key + ">";
-        pahma = true;
-      } else if (key.equals("pahmaEthnographicFileCode")) {
-        pahmaValues += "<pahmaEthnographicFileCodeList><" + key + ">" + value + "</" + key + "></pahmaEthnographicFileCode>";
-        pahma = true;
       } else {
         commonValues += "<" + key + ">" + value + "</" + key + ">";
       }
@@ -155,24 +141,9 @@ public class BulkObjectEditBatchJob extends  AbstractBatchJob {
                               "xmlns:ns2=\"http://collectionspace.org/services/collectionobject\" " +
                               "xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\">" + 
                               commonValues +
-                            "</ns2:collectionobjects_common>";
-
-    if (pahma) {
-      commonPayload += "<ns2:collectionobjects_pahma " + 
-                        "xmlns:ns2=\"http://collectionspace.org/services/collectionobject/local/pahma\" " +
-                        "xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\">" + pahmaValues + 
-                        "</ns2:collectionobjects_pahma>";
-    }
-    if (ucbnh) {
-      commonPayload += "<n2:collectionobjects_naturalhistory " +
-                        "xmlns:ns2=\"http://collectionspace.org/services/collectionobject/domain/naturalhistory\" " +
-                        "xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\">" + ucbnhValues +
-                        "</ns2:collectionobjects_naturalhistory>";
-    }
+                            "</ns2:collectionobjects_common></document>";
 
 
-
-    commonPayload += "</document>";
     return commonPayload;
   }
 
