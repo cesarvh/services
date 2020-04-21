@@ -19,11 +19,23 @@ import org.collectionspace.services.client.CollectionObjectClient;
 import org.collectionspace.services.client.PayloadOutputPart;
 import org.collectionspace.services.client.PoxPayloadOut;
 
-import org.dom4j.Document;
 import org.dom4j.DocumentException;
-import org.dom4j.DocumentHelper;
 import org.dom4j.Element;
-import org.dom4j.Node;
+
+/**
+ * A batch job that updates the following fields:
+ * collectionobject_common: numberOfObjects, numberValue, material, fieldCollectionPlace, responsibleDepartment, assocPeople, numberType, objectProductionPerson, objectProductionPlace, fieldCollector, objectStatus, contentPlace, objectName
+ * collectionobject_naturalistory: taxon
+ * collectionobject_pahma: pahmaEthnographicFileCodeList, pahmaFieldLocVerbatim, inventoryCount
+ * The list contexts is
+ *
+ *
+ * The following parameters are allowed:
+ *
+ * targetCSID: csid of target records, a dictionary of parameters (fields to update) and their new values 
+ *
+ * @author Cesar Villalobos
+ */
 
 public class BulkObjectEditBatchJob extends  AbstractBatchJob {
   final Logger logger = LoggerFactory.getLogger(BulkObjectEditBatchJob.class);
@@ -51,29 +63,24 @@ public class BulkObjectEditBatchJob extends  AbstractBatchJob {
           throw new Exception("There is nothing to update. Aborting...");
         }
 
-        // setResults(updateRecords(csids, fieldsToValues));
         int numAffected = 0 ;
         String payload = preparePayload(fieldsToValues);
-        PoxPayloadOut batchPayload = new PoxPayloadOut(payload.getBytes());
-
-        
-        // PoxPayloadOut collectionObjectPayload = findCollectionObjectByCsid(collectionObjectCsid);
 
         for (String csid : csids) {
-          String mergedPayload = mergePayloads(csid, batchPayload);
+          String mergedPayload = mergePayloads(csid, new PoxPayloadOut(payload.getBytes()));
 
           if (mergedPayload != null) {
             if(updateRecord(csid, mergedPayload) != -1) {
               numAffected += 1;
             } else {
               // Make this more obvious?
-              logger.warn("The record with csid " +  csid + " was not updated");
+              logger.warn("The record with csid " +  csid + " was not updated.");
             }
           }
         }
         setCompletionStatus(STATUS_COMPLETE);
         results.setNumAffected(numAffected);
-        results.setUserNote("reindexed " + numAffected + " records");
+        results.setUserNote("Updated " + numAffected + " records with the following " + fieldsToValues.toString());
 
         setResults(results);
       } else {
@@ -85,18 +92,7 @@ public class BulkObjectEditBatchJob extends  AbstractBatchJob {
     }
   }
   public String preparePayload(HashMap<String, String> fieldsToUpdate)  {
-    /* Values that will require special handing:
-      pahma: inventoryCount, pahmaFieldLocVerbatim, pahmaEthnographicFileCodeList
-      ucbnh naturalhistory: taxon
-    
-    */ 
-
-
     String commonValues = "";
-    String ucbnhValues = "";
-    String pahmaValues = "";
-    Boolean pahma = false;
-    Boolean ucbnh = false;
 
     String otherNumber = "<otherNumberList><otherNumber>";
     Boolean otherNumFlag = false;
@@ -136,17 +132,6 @@ public class BulkObjectEditBatchJob extends  AbstractBatchJob {
       } else {
         commonValues += "<" + key + ">" + value + "</" + key + ">";
       }
-      // } else if (key.equals("taxonomicIdentGroupList")) {
-        // ucbnhValues += "<taxonomicIdentGroup><" + key + ">" + value + "<" + key + "/><taxonomicIdentGroup/>";
-        // ucbnh = true;
-      // } else if (key.equals("materialGroup")) {
-      //   commonValues += "<materialGroupList><" + key + ">" + value + "<" + key + "/><materialGroupList/>";
-      // } else if (key.equals("inventoryCount") || key.equals("pahmaFieldLocVerbatim") || key.equals("pahmaEthnographicFileCodeList")) {
-      //   pahmaValues += "<" + key + ">" + value + "</" + key + ">";
-      //   pahma = true;
-      // } else {
-      //   commonValues += "<" + key + ">" + value + "</" + key + ">";
-      // }
     }
 
     if (otherNumFlag) {
@@ -154,95 +139,55 @@ public class BulkObjectEditBatchJob extends  AbstractBatchJob {
       commonValues += otherNumber;
     }
 
-    String tenant = "";
-
     String commonPayload = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>" +
     "<document name=\"collectionobjects\">" +
       "<ns2:collectionobjects_common " +
       "xmlns:ns2=\"http://collectionspace.org/services/collectionobject\" " +
       "xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\">" +
       commonValues +
-    "</ns2:collectionobjects_common>";
+      "</ns2:collectionobjects_common></document>";
 
-    if (pahma) {
-      commonPayload += "<ns2:collectionobjects_pahma " +
-                        "xmlns:ns2=\"http://collectionspace.org/services/collectionobject/local/pahma\" " +
-                        "xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\">" + pahmaValues +
-                        "</ns2:collectionobjects_pahma>";
-    }
-    if (ucbnh) {
-      commonPayload += "<n2:collectionobjects_naturalhistory " +
-                        "xmlns:ns2=\"http://collectionspace.org/services/collectionobject/domain/naturalhistory\" " +
-                        "xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\">" + ucbnhValues +
-                        "</ns2:collectionobjects_naturalhistory>";
-    }
-
-
-
-    commonPayload += "</document>";
     return commonPayload;
   }
 
   public String mergePayloads(String csid, PoxPayloadOut batchPayload) throws Exception {
     // now we have the bytes for both t
-    HashMap<String, Element> elementList = new HashMap<String, Element>();
+    HashMap<String, Element> batchElementList = new HashMap<String, Element>();
     PoxPayloadOut collectionObjectPayload = findCollectionObjectByCsid(csid);
 
     // Now we have a list of Elements that we can go thru and update
-    for (PayloadOutputPart candidatePart : batchPayload.getParts()) {
-      Element candidatePartElement = candidatePart.asElement();
-      elementList.put(candidatePartElement.getName(), candidatePartElement);
+    for (PayloadOutputPart batchCandidatePart : batchPayload.getParts()) {
+      Element batchCandidatePartElement = batchCandidatePart.asElement();
+      batchElementList.put(batchCandidatePartElement.getName(), batchCandidatePartElement);
     }
 
-    for (String elem : elementList.keySet()) {
+    for (String batchPartElement : batchElementList.keySet()) {
 
-      Element collectionObjectElement = collectionObjectPayload.getPart(elem).asElement();
-
-      Element batchElement = elementList.get(elem);
-
-
-//      collectionObjectPayload.addPart(); label, elementBody
-      for (Element batchElemChild : (List<Element>) batchElement.elements()) {
-        String childElemName = batchElemChild.getName(); // Now we need to find the matching element
-
-        if (childElemName == null) {continue;}
+      Element objectPartElement = collectionObjectPayload.getPart(batchPartElement).asElement();
+      Element batchElement = batchElementList.get(batchPartElement);
 
 
-//        Element collectionObjElement = collectionObjectElement.element("objectStatusList")
-        Element collectionObjElementList = collectionObjectElement.element(childElemName);
+      for (Element batchElementField : (List<Element>) batchElement.elements()) {
+        String childElemName = batchElementField.getName();
 
-//        if size of elements() below is 0, then it is non repeating, so just remove and set
-        for (Element objElem : (List<Element>) collectionObjElementList.elements()) {
-//          if elements is empty then its not a repeating list
-          // if the objElemName is in the list of singleFields...then dont add it but we can get to that later
-          batchElemChild.add(objElem.createCopy());
+        if (childElemName == null) {
+          continue;
         }
 
-        collectionObjectElement.remove(collectionObjElementList);
-        collectionObjectElement.add(batchElemChild.createCopy());
-//        collectionObjElement.add(batchElemChild.elements().get(0).createCopy());
+        Element collectionObjElementList = objectPartElement.element(childElemName);
+        
+        if (collectionObjElementList != null) {
+          for (Element objElem : (List<Element>) collectionObjElementList.elements()) {
+            batchElementField.add(objElem.createCopy());
+          }
+          objectPartElement.remove(collectionObjElementList);
+        }
 
-//        collectionObjectPayload.addPart(); label, elementBody
-//        PoxPayloadOut pLoad = collectionObjectPayload.addPart(childElemName, batchElemChild);
-
-//        collectionObjectElement
-
-//        collectionObjectElement.add(batchElemChild);
-//        public PayloadOutputPart addPart(String label, Element elementBody) {
-
-        int y = 0;
-
+        objectPartElement.add(batchElementField.createCopy());
       }
-
-      // now we have both elements. Merge uwu
-
-
     }
 
-    
-
     return collectionObjectPayload.asXML();
-    // use result.asXML to get a final form
   }
   
   public int updateRecord(String csid, String payload) throws URISyntaxException, DocumentException {
