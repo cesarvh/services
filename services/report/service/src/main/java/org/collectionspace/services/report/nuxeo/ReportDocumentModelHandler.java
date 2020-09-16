@@ -211,9 +211,14 @@ public class ReportDocumentModelHandler extends NuxeoDocumentModelHandler<Report
 			modeProperty = InvocableJAXBSchema.SUPPORTS_SINGLE_DOC;
     		params.put(REPORTS_STD_CSID_PARAM, invContext.getSingleCSID());
 		} else if (Invocable.INVOCATION_MODE_LIST.equalsIgnoreCase(invocationMode)) {
+
+
 			modeProperty = InvocableJAXBSchema.SUPPORTS_DOC_LIST;
 			List<String> csids = null;
 			InvocationContext.ListCSIDs listThing = invContext.getListCSIDs();
+
+			logger.debug(listThing.toString());
+
 				if (listThing!=null) {
 					csids = listThing.getCsid();
 				}
@@ -221,15 +226,16 @@ public class ReportDocumentModelHandler extends NuxeoDocumentModelHandler<Report
 	    			throw new BadRequestException(
 	    					"ReportResource: Report invoked in list mode, with no csids in list." );
 				}
+				logger.debug(csids.toString());
 				StringBuilder sb = new StringBuilder();
 				boolean first = true;
-				for(String csidItem : csids) {
-					if(first)
-						first = false;
-					else
-						sb.append(CSID_LIST_SEPARATOR);
-	   				sb.append(csidItem);
-				}
+				// for(String csidItem : csids) {
+				// 	if(first)
+				// 		first = false;
+				// 	else
+				// 		sb.append(CSID_LIST_SEPARATOR);
+	   		// 		sb.append(csidItem);
+				// }
     		params.put(REPORTS_STD_CSIDLIST_PARAM, sb.toString());
 		} else if(Invocable.INVOCATION_MODE_GROUP.equalsIgnoreCase(invocationMode)) {
 			modeProperty = InvocableJAXBSchema.SUPPORTS_GROUP;
