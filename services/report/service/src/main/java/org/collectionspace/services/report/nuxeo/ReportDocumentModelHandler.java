@@ -226,16 +226,20 @@ public class ReportDocumentModelHandler extends NuxeoDocumentModelHandler<Report
 	    			throw new BadRequestException(
 	    					"ReportResource: Report invoked in list mode, with no csids in list." );
 				}
-				logger.warn(csids.toString());
+				// logger.warn(csids.toString());
 				StringBuilder sb = new StringBuilder();
 				boolean first = true;
-				// for(String csidItem : csids) {
-				// 	if(first)
-				// 		first = false;
-				// 	else
-				// 		sb.append(CSID_LIST_SEPARATOR);
-	   		// 		sb.append(csidItem);
-				// }
+				logger.warn("The following csids are gonna be processed: " + csids.toString());
+				for(String csidItem : csids) {
+					logger.warn("Processing csid " + csidItem);
+					if(first)
+						sb.append(csidItem);
+						first = false;
+					else
+						sb.append(CSID_LIST_SEPARATOR);
+	   				sb.append(csidItem);
+				}
+				logger.warn("The total csids: " + sb.toString());
     		params.put(REPORTS_STD_CSIDLIST_PARAM, sb.toString());
 		} else if(Invocable.INVOCATION_MODE_GROUP.equalsIgnoreCase(invocationMode)) {
 			modeProperty = InvocableJAXBSchema.SUPPORTS_GROUP;
