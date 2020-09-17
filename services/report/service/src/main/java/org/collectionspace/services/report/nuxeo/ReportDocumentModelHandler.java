@@ -197,7 +197,7 @@ public class ReportDocumentModelHandler extends NuxeoDocumentModelHandler<Report
 					AuthN.get().getUserId(), reportsCommon.getName(), csid);
 			throw new PermissionException(msg);
 		}
-		logger.log
+		logger.warn("I REACH HERE");
 		String invocationMode = invContext.getMode();
 		String modeProperty = null;
 		HashMap<String, Object> params = new HashMap<String, Object>();
