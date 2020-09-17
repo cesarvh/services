@@ -197,7 +197,7 @@ public class ReportDocumentModelHandler extends NuxeoDocumentModelHandler<Report
 					AuthN.get().getUserId(), reportsCommon.getName(), csid);
 			throw new PermissionException(msg);
 		}
-
+		logger.log
 		String invocationMode = invContext.getMode();
 		String modeProperty = null;
 		HashMap<String, Object> params = new HashMap<String, Object>();
@@ -217,7 +217,7 @@ public class ReportDocumentModelHandler extends NuxeoDocumentModelHandler<Report
 			List<String> csids = null;
 			InvocationContext.ListCSIDs listThing = invContext.getListCSIDs();
 
-			logger.debug(listThing.toString());
+			logger.warn(listThing.toString());
 
 				if (listThing!=null) {
 					csids = listThing.getCsid();
@@ -226,7 +226,7 @@ public class ReportDocumentModelHandler extends NuxeoDocumentModelHandler<Report
 	    			throw new BadRequestException(
 	    					"ReportResource: Report invoked in list mode, with no csids in list." );
 				}
-				logger.debug(csids.toString());
+				logger.warn(csids.toString());
 				StringBuilder sb = new StringBuilder();
 				boolean first = true;
 				// for(String csidItem : csids) {
@@ -248,9 +248,9 @@ public class ReportDocumentModelHandler extends NuxeoDocumentModelHandler<Report
         			+invocationMode);
 		}
 		
-		logger.debug("The invocation context is: \n " + getInvocationContextLogging(invContext, params));
-		logger.debug("The report is being called with the following parameters, which are being passed to Jasper: \n" + params.toString());
-		logger.debug("The mode being passed to Jasper is: " + invocationMode);
+		logger.warn("The invocation context is: \n " + getInvocationContextLogging(invContext, params));
+		logger.warn("The report is being called with the following parameters, which are being passed to Jasper: \n" + params.toString());
+		logger.warn("The mode being passed to Jasper is: " + invocationMode);
 		
 		NuxeoRepositoryClientImpl repoClient = (NuxeoRepositoryClientImpl)this.getRepositoryClient(ctx);
 		repoSession = this.getRepositorySession();
