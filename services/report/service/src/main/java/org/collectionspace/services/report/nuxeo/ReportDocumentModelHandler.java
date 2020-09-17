@@ -232,12 +232,13 @@ public class ReportDocumentModelHandler extends NuxeoDocumentModelHandler<Report
 				logger.warn("The following csids are gonna be processed: " + csids.toString());
 				for(String csidItem : csids) {
 					logger.warn("Processing csid " + csidItem);
-					if(first)
+					if(first) {
 						sb.append(csidItem);
 						first = false;
-					else
+					} else {
 						sb.append(CSID_LIST_SEPARATOR);
-	   				sb.append(csidItem);
+						 sb.append(csidItem);
+					}
 				}
 				logger.warn("The total csids: " + sb.toString());
     		params.put(REPORTS_STD_CSIDLIST_PARAM, sb.toString());
