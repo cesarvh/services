@@ -1,4 +1,5 @@
 package org.collectionspace.services.batch.nuxeo;
+import org.collectionspace.services.batch.BatchCommon;
 
 import java.net.URISyntaxException;
 import java.util.Arrays;
@@ -31,6 +32,10 @@ import org.slf4j.LoggerFactory;
 public class CreateVoucherBatchJob extends AbstractBatchJob {
 	final Logger logger = LoggerFactory.getLogger(CreateVoucherBatchJob.class);
 
+	public void run(BatchCommon batchCommon) {
+    run();
+	}
+	
 	public CreateVoucherBatchJob() {
 		setSupportedInvocationModes(Arrays.asList(INVOCATION_MODE_SINGLE));
 	}

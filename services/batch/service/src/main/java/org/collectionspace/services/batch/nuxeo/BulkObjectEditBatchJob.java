@@ -44,10 +44,6 @@ public class BulkObjectEditBatchJob extends  AbstractBatchJob {
     setSupportedInvocationModes(Arrays.asList(INVOCATION_MODE_LIST));
   }
 
-  public void run(BatchCommon batchCommon) {
-    run();
-  }
-
   @Override
   public void run() {
     setCompletionStatus(STATUS_MIN_PROGRESS);
