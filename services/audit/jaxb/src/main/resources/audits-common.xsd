@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+
+<!--
+    Audit schema (XSD)
+    
+    Entity  : Audit Trail
+    Part    : Common
+    Used for: JAXB binding between XML and Java objects
+
+    $LastChangedRevision: 2316 $
+    $LastChangedDate: 2018-05-02 16:03:51 -0700 (Wed, 02 Jun 2010) $
+-->
+
+<xs:schema 
+  xmlns:xs="http://www.w3.org/2001/XMLSchema"
+  xmlns:jaxb="http://java.sun.com/xml/ns/jaxb"
+  jaxb:version="1.0" elementFormDefault="unqualified"
+  xmlns:ns="http://collectionspace.org/services/audit"
+  xmlns="http://collectionspace.org/services/audit"
+  targetNamespace="http://collectionspace.org/services/audit"
+  version="0.1"
+>
+
+<!--
+    Avoid XmlRootElement nightmare:
+    See http://weblogs.java.net/blog/kohsuke/archive/2006/03/why_does_jaxb_p.html
+-->
+    
+    <!-- Audit -->
+    <xs:element name="audits_common">
+        <!-- <xs:complexType> -->
+            <!-- <xs:sequence> -->
+                <!-- <xs:element name="title" type="xs:string"/> -->
+                <!-- <xs:element name="referenceNumber" type="xs:string"/> -->
+                <!-- <xs:element name="methodList" type="methodList"/> -->
+            <!-- </xs:sequence> -->
+        <!-- </xs:complexType> -->
+    </xs:element>
+</xs:schema>
+
