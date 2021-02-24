@@ -51,8 +51,8 @@ public class AuditResource extends NuxeoBasedResource {
     }
 
     @Override
-    public Class<AuditsCommon> getCommonPartClass() {
-    	return AuditsCommon.class;
+    public Class<AuditCommon> getCommonPartClass() {
+    	return auditCommon.class;
     }
 }
 

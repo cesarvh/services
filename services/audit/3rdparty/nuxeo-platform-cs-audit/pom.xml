@@ -20,7 +20,7 @@
     <properties>
         <ServiceName>audit</ServiceName>
         <NuxeoDocTypeName>Audit</NuxeoDocTypeName>
-        <CommonSchemaName>audits _common</CommonSchemaName>
+        <CommonSchemaName>audit_common</CommonSchemaName>
 		<Lifecycle>cs_default</Lifecycle>
     </properties>
 

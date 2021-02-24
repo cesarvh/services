@@ -16,7 +16,7 @@
  */
 package org.collectionspace.services.client;
 
-import org.collectionspace.services.audit.AuditsCommon;
+import org.collectionspace.services.audit.AuditCommon;
 
 /**
  * AuditClient.java
@@ -25,7 +25,7 @@ import org.collectionspace.services.audit.AuditsCommon;
  * $LastChangedDate$
  *
  */
-public class AuditClient extends AbstractCommonListPoxServiceClientImpl<AuditProxy, AuditsCommon> {
+public class AuditClient extends AbstractCommonListPoxServiceClientImpl<AuditProxy, AuditCommon> {
 
     public static final String SERVICE_NAME = "audit";
     public static final String SERVICE_PATH_COMPONENT = SERVICE_NAME;

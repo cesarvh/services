@@ -5,6 +5,6 @@ package org.collectionspace.services.test;
  * 
  * @version $Revision$
  */
-public class AuditServiceTest {
+public class AuditerviceTest {
 	//empty
 }

@@ -27,7 +27,7 @@
 -->
     
     <!-- Audit -->
-    <xs:element name="audits_common">
+    <xs:element name="audit_common">
         <xs:complexType>
             <xs:sequence>
                 <!--  Common identifier -->

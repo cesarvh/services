@@ -23,7 +23,7 @@
  */
 package org.collectionspace.services.audit.nuxeo;
 
-import org.collectionspace.services.audit.AuditsCommon;
+import org.collectionspace.services.audit.AuditCommon;
 import org.collectionspace.services.nuxeo.client.java.NuxeoDocumentModelHandler;
 
 /** AuditDocumentModelHandler
@@ -31,6 +31,6 @@ import org.collectionspace.services.nuxeo.client.java.NuxeoDocumentModelHandler;
  *  $LastChangedDate$
  */
 public class AuditDocumentModelHandler
-        extends NuxeoDocumentModelHandler<AuditsCommon> {
+        extends NuxeoDocumentModelHandler<AuditCommon> {
 }
 
