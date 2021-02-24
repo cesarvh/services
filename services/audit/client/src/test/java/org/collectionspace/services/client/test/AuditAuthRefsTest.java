@@ -54,6 +54,6 @@ import org.slf4j.LoggerFactory;
  *
  * $LastChangedRevision$ $LastChangedDate$
  */
-public class AuditAuthRefsTest.java extends BaseServiceTest<AbstractCommonList> {
+public class AuditAuthRefsTest extends BaseServiceTest<AbstractCommonList> {
  // empty
 }

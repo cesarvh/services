@@ -28,13 +28,66 @@
     
     <!-- Audit -->
     <xs:element name="audits_common">
-        <!-- <xs:complexType> -->
-            <!-- <xs:sequence> -->
-                <!-- <xs:element name="title" type="xs:string"/> -->
-                <!-- <xs:element name="referenceNumber" type="xs:string"/> -->
-                <!-- <xs:element name="methodList" type="methodList"/> -->
-            <!-- </xs:sequence> -->
-        <!-- </xs:complexType> -->
-    </xs:element>
-</xs:schema>
+        <xs:complexType>
+            <xs:sequence>
+                <!--  Common identifier -->
+                <xs:element name="csid" type="xs:string" />
+				<xs:element name="rev" type="xs:integer" /> <!-- Revision --> 
 
+                <xs:element name="idNumber" type="xs:string"/>
+                <xs:element name="recordType" type="xs:string"/>
+                <xs:element name="recordId" type="xs:string"/>
+
+                <xs:element name="fieldChangedGroupList" type="fieldChangedGroupList"/>
+
+                <xs:element name="relationshipGroupList" type="relationshipGroupList"/>
+
+                <xs:element name="relRecordChecksumList" type="relRecordChecksumList"/>
+                <xs:element name="saveMessage" type="xs:string"/>
+                <xs:element name="updatedBy" type="xs:string"/>
+                <xs:element name="updatedAt" type="xs:string"/>
+                <xs:element name="recordChecksum" type="xs:string"/>
+
+            </xs:sequence>
+        </xs:complexType>
+    </xs:element>
+
+    <xs:complexType name="fieldChangedGroupList">
+        <xs:sequence>
+            <xs:element name="fieldChangedGroup" type="fieldChangedGroup" minOccurs="0"
+                        maxOccurs="unbounded"/>
+        </xs:sequence>
+    </xs:complexType>
+
+    <xs:complexType name="relationshipGroupList">
+        <xs:sequence>
+            <xs:element name="relationshipGroup" type="relationshipGroup" minOccurs="0"
+                        maxOccurs="unbounded"/>
+        </xs:sequence>
+    </xs:complexType>
+
+    <xs:complexType name="fieldChangedGroup">
+        <xs:sequence>
+            <xs:element name="fieldName" type="xs:string"/>
+            <xs:element name="originalValue" type="xs:string"/>
+            <xs:element name="newValue" type="xs:string"/>
+            <xs:element name="changeReason" type="xs:string"/>
+        </xs:sequence>
+    </xs:complexType>
+
+    <xs:complexType name="relationshipGroup">
+        <xs:sequence>
+            <xs:element name="relPredicate" type="xs:string"/>
+            <xs:element name="relObjRecordType" type="xs:string"/>
+            <xs:element name="relObjectTitle" type="xs:string"/>
+            <xs:element name="relChange" type="xs:string"/>
+        </xs:sequence>
+    </xs:complexType>
+
+    <xs:complexType name="relRecordChecksumList">
+        <xs:sequence>
+            <xs:element name="relRecordChecksum" type="xs:string" minOccurs="0" maxOccurs="unbounded"/>
+        </xs:sequence>
+    </xs:complexType>
+
+</xs:schema>
