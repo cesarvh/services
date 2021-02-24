@@ -91,6 +91,7 @@
 		<module>index</module>
 		<module>media</module>
 		<module>uoc</module>
+		<module>audit</module>
 		<module>publicitem</module>
 		<module>IntegrationTests</module>
 		<module>PerformanceTests</module>
